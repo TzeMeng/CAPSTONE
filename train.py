@@ -95,12 +95,12 @@ valid_dataset = SquadDataset(d_w_context, d_c_context, d_w_question, d_c_questio
 train_dataloader = DataLoader(train_dataset,
                               shuffle=True,
                               batch_size=hyper_params["batch_size"],
-                              num_workers=2)
+                              num_workers=4)
 
 valid_dataloader = DataLoader(valid_dataset,
                               shuffle=True,
                               batch_size=hyper_params["batch_size"],
-                              num_workers=2)
+                              num_workers=4)
 
 print("Length of training data loader is:", len(train_dataloader))
 print("Length of valid data loader is:", len(valid_dataloader))
