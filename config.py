@@ -19,10 +19,10 @@ max_len_question = 50
 max_len_word = 25
 
 # training hyper-parameters
-num_epochs = 1
+num_epochs = 15
 batch_size = 1
-learning_rate = 0.5
-drop_prob = 0.2
+learning_rate = 0.7
+drop_prob = 0.1
 hidden_size = 100
 char_channel_width = 5
 char_channel_size = 100

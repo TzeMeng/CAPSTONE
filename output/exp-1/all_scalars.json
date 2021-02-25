@@ -1,0 +1,1 @@
+{"output/exp-1/train/loss": [[1614247052.8744228, null, 11.19]], "output/exp-1/train/epoch": [[1614247052.8744228, null, 1.0]], "output/exp-1/valid/loss": [[1614247172.5081103, null, 9.15]], "output/exp-1/valid/EM": [[1614247172.5081103, null, 0.04]], "output/exp-1/valid/F1": [[1614247172.5081103, null, 0.1]], "output/exp-1/valid/epoch": [[1614247172.5081103, null, 1.0]]}
