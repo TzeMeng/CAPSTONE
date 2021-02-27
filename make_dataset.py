@@ -106,8 +106,13 @@ class SquadPreprocessor:
 
         # download vocabulary if not done yet
         if directory == "train":
+            
             labels = [np.array(l.strip("\n").split(), dtype=np.int32) for l in labels]
-
+            labels = [np.array([0,0],dtype=np.int32) if l.size < 1 else l for l in labels]
+            for l in labels:
+                if l.size < 1:
+                    print(l)
+            print("All good")
             word_vocab, word2idx, char_vocab, char2idx = build_vocab(directory + ".context", directory + ".question",
                                                                      "word_vocab.pkl", "word2idx.pkl", "char_vocab.pkl",
                                                                      "char2idx.pkl", is_train=is_train,
@@ -120,6 +125,9 @@ class SquadPreprocessor:
 
         else:
             labels = np.array([l.strip("\n") for l in labels])
+            for l in labels:
+                if l.size < 1:
+                    print(l)
 
             with open(os.path.join(self.data_dir, "train", "word2idx.pkl"), "rb") as wi,\
                  open(os.path.join(self.data_dir, "train", "char2idx.pkl"), "rb") as ci:

@@ -5,6 +5,7 @@ import os
 import json
 import torch
 import torch.nn as nn
+import tensorflow as tf
 
 from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
@@ -128,7 +129,6 @@ else:
     epoch_checkpoint = 0
 
 
-
 if __name__ == '__main__':
     # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
     # train the Model
@@ -137,23 +137,25 @@ if __name__ == '__main__':
         print("##### epoch {:2d}".format(epoch + epoch_checkpoint + 1))
         model.train()
         train_losses = 0
+        
         for i, batch in enumerate(train_dataloader):
-            try:
-                w_context, c_context, w_question, c_question, label1, label2 = batch[0].long().to(device),\
-                                                                            batch[1].long().to(device), \
-                                                                            batch[2].long().to(device), \
-                                                                            batch[3].long().to(device), \
-                                                                            batch[4][:, 0].long().to(device),\
-                                                                            batch[4][:, 1].long().to(device)
-                optimizer.zero_grad()
-                pred1, pred2 = model(w_context, c_context, w_question, c_question)
-                loss = criterion(pred1, label1) + criterion(pred2, label2)
-                train_losses += loss.item()
+            with tf.device('/gpu:0'):
+                try:
+                    w_context, c_context, w_question, c_question, label1, label2 = batch[0].long().to(device),\
+                                                                                batch[1].long().to(device), \
+                                                                                batch[2].long().to(device), \
+                                                                                batch[3].long().to(device), \
+                                                                                batch[4][:, 0].long().to(device),\
+                                                                                batch[4][:, 1].long().to(device)
+                    optimizer.zero_grad()
+                    pred1, pred2 = model(w_context, c_context, w_question, c_question)
+                    loss = criterion(pred1, label1) + criterion(pred2, label2)
+                    train_losses += loss.item()
 
-                loss.backward()
-                optimizer.step()
-            except:
-                continue
+                    loss.backward()
+                    optimizer.step()
+                except:
+                    continue
 
         writer.add_scalars("train", {"loss": np.round(train_losses / len(train_dataloader), 2),
                                     "epoch": epoch + 1+ epoch_checkpoint})
@@ -167,25 +169,26 @@ if __name__ == '__main__':
         n_samples = 0
         with torch.no_grad():
             for i, batch in enumerate(valid_dataloader):
-                try:
-                    w_context, c_context, w_question, c_question, labels = batch[0].long().to(device), \
-                                                                        batch[1].long().to(device), \
-                                                                        batch[2].long().to(device), \
-                                                                        batch[3].long().to(device), \
-                                                                        batch[4]
+                with tf.device('/gpu:0'):
+                    try:
+                        w_context, c_context, w_question, c_question, labels = batch[0].long().to(device), \
+                                                                            batch[1].long().to(device), \
+                                                                            batch[2].long().to(device), \
+                                                                            batch[3].long().to(device), \
+                                                                            batch[4]
 
-                    first_labels = torch.tensor([[int(a) for a in l.split("|")[0].split(" ")]
-                                                for l in labels], dtype=torch.int64).to(device)
-                    pred1, pred2 = model(w_context, c_context, w_question, c_question)
-                    loss = criterion(pred1, first_labels[:, 0]) + criterion(pred2, first_labels[:, 1])
-                    valid_losses += loss.item()
-                    em, f1 = compute_batch_metrics(w_context, idx2word, pred1, pred2, labels)
-                    valid_em += em
-                    valid_f1 += f1
-                    n_samples += w_context.size(0)
+                        first_labels = torch.tensor([[int(a) for a in l.split("|")[0].split(" ")]
+                                                    for l in labels], dtype=torch.int64).to(device)
+                        pred1, pred2 = model(w_context, c_context, w_question, c_question)
+                        loss = criterion(pred1, first_labels[:, 0]) + criterion(pred2, first_labels[:, 1])
+                        valid_losses += loss.item()
+                        em, f1 = compute_batch_metrics(w_context, idx2word, pred1, pred2, labels)
+                        valid_em += em
+                        valid_f1 += f1
+                        n_samples += w_context.size(0)
 
-                except:
-                    continue
+                    except:
+                        continue
 
             writer.add_scalars("valid", {"loss": np.round(valid_losses / len(valid_dataloader), 2),
                                         "EM": np.round(valid_em / n_samples, 2),
