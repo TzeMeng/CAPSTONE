@@ -74,11 +74,12 @@ def eval(context, question):
                   char_vectors=char_embedding_matrix,
                   hidden_size=config.hidden_size,
                   drop_prob=config.drop_prob)
+
     try:
         if config.cuda:
-            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model_final.pkl"))["state_dict"])
+            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model_last_checkpoint.pkl"))["state_dict"])
         else:
-            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model_final.pkl"),
+            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model_last_checkpoint.pkl"),
                                              map_location=lambda storage, loc: storage)["state_dict"])
         print("Model weights successfully loaded.")
     except:
