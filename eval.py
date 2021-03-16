@@ -98,8 +98,6 @@ def eval(context, question):
         prediction = " ".join(context[starts.item(): ends.item() + 1])
 
     return prediction
-
-
 if __name__ == "__main__":
     context = " Beer is sold in bottles and cans; it may also be available on draught,\
     particularly in pubs and bars. The brewing industry is a global business, consisting of several dominant \
