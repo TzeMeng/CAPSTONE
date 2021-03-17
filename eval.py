@@ -107,6 +107,8 @@ if __name__ == "__main__":
     and is associated with social traditions such as beer festivals, as well as a rich pub culture involving activities \
     like pub crawling, and pub games such as bar billiards."
 
+
+
     questions = ["What is beer sold in?",
                  "What is the alcoholic strength of beer?",
                  "What are some activities that beer is often associated with?"]
