@@ -4,6 +4,7 @@ exp = "exp-1"
 data_dir = "data/"
 train_dir = data_dir + "train/"
 test_dir = data_dir + "test/"
+result = "result/"
 
 # model paths
 spacy_en = "/Users/ngtze/anaconda3/Lib/site-packages/en_core_web_sm/en_core_web_sm-3.0.0"

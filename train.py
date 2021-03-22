@@ -1,4 +1,5 @@
 # external libraries
+import pandas as pd
 import numpy as np
 import pickle
 import os
@@ -128,11 +129,19 @@ else:
     best_valid_loss = 100
     epoch_checkpoint = 0
 
+try:
+    result = pd.read_excel(config.result + "result.xlsx")
+
+except:
+    result = pd.DataFrame(columns =['Batch_Size', 'Epochs', 'Exact Match','F1 Score'])
 
 if __name__ == '__main__':
     # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
     # train the Model
     print("Starting training...")
+
+    epoch_result = pd.DataFrame(columns =['Batch_Size', 'Epochs', 'Exact Match','F1 Score'])
+
     for epoch in range(hyper_params["num_epochs"]):
         print("##### epoch {:2d}".format(epoch + epoch_checkpoint + 1))
         model.train()
@@ -198,6 +207,16 @@ if __name__ == '__main__':
                                                                                         len(valid_dataloader), 2)))
             print("Valid EM of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_em / n_samples, 2)))
             print("Valid F1 of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_f1 / n_samples, 2)))
+
+            epoch_result = epoch_result.append({'Batch_Size': config.batch_size, 
+                                                'Epochs': epoch + 1 + epoch_checkpoint,
+                                                'Exact Match': np.round(valid_em / n_samples, 2),
+                                                'F1 Score' : np.round(valid_f1 / n_samples, 2)})
+            result.append(epoch_result)
+
+        #save results
+        result.to_excel(config.result + "result.xlsx")
+
 
         # save last model weights
         save_checkpoint({

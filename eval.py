@@ -114,6 +114,7 @@ if __name__ == "__main__":
                  "What are some activities that beer is often associated with?"]
 
     print("C:", context, "\n")
+    
     for q in questions:
         print("Q:", q)
         answer = eval(context, q)
