@@ -106,7 +106,8 @@ def build_embeddings(vocab, embedding_path="", output_path="", vec_size=50):
             embedding_matrix.append(embedding_dict[v])
         else:
             count += 1
-            embedding_matrix.append(np.random.normal(0, 0.1, vec_size))
+            #embedding_matrix.append(np.random.normal(0, 0.1, vec_size)) #Randomly intialized vector
+            embedding_matrix.append(np.ones(vec_size))
     # Save the embedding matrix
     with open(os.path.join(config.train_dir, output_path), "wb") as e:
         pickle.dump(embedding_matrix, e)
