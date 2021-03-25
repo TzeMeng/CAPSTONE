@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Main{% endblock %}
+
+<!-- Page Content -->
+{% block mainContent %}
+<div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="mt-5">{% block h1 %}{% endblock %}</h1>
+          <div class="col-sm-6 col-centered">
+            <!-- Instructional carousel slide show -->
+            <div id="info-txt" class="carousel slide" data-ride="carousel">
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img class="d-block w-200" src="{{ url_for('static',    filename='images/embedding.png') }}" alt="First slide">
+                </div>
+                <div class="carousel-item">
+                  <img class="d-block w-200" src="{{ url_for('static',    filename='images/main.jpg') }}" alt="Second slide">
+                </div>
+                <div class="carousel-item">
+                  <img class="d-block w-200" src="{{ url_for('static',    filename='images/model.jpg') }}" alt="Third slide">
+                </div>
+                <!-- <div class="carousel-item">
+                  <img class="d-block w-200" src="{{ url_for('static',    filename='images/slide4.png') }}" alt="Fourth slide">
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <form id="getUserInput" action="{{ url_for('scrape_now') }}" method="post">
+                <label class="control-label requiredField" for="input">
+                  Please input at least one query <mark>up to 5 at once</mark>
+                <span class="asteriskField">*</span>
+                </label>
+                <textarea id="input_q" class="form-control" name="queries" rows="3" placeholder="Enter your queries here&#10;Eg. Query 1, Query 2, Query 3... Up to 5 Queries" autofocus></textarea>
+                <span class="help-block" id="hint_textarea">
+                    <span class="text-muted">Please separate your queries with a ',' comma in between each</span>
+                </span>
+                <br/>
+                <br/>
+                <textarea id="input_c" class="form-control" name="context_para" rows="6" placeholder="Paste document/ context Paragraph Here" autofocus></textarea>
+                <br/>
+<!--                <div class="form-group row">-->
+<!--                    <div class="col-xs-2 text-center">-->
+<!--                      <label for="selection">Please indicate</label>-->
+<!--                      <select name="inc_exc" class="form-control" id="selection" required>-->
+<!--                        <option value="True">Yes</option>-->
+<!--                        <option value="False">No</option>-->
+<!--                      </select>-->
+<!--                    </div>-->
+<!--                </div>-->
+                <button type="button" id="btnFetch" class="btn btn-primary mb-2" onclick="validator();">Run</button>
+            </form>
+          </div>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additionalscripts %}
+<script src="{{ url_for('static',    filename='js/home.js') }}"></script>
+{% endblock %}
