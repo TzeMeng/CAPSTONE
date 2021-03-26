@@ -6,7 +6,8 @@ from firebase_admin import firestore
 import firebase_admin
 from firebase_admin import credentials
 
-import flask
+from flask import Flask, render_template, request, jsonify
+import json
 
 cred = credentials.Certificate("ENTER YOUR CREDENTIALS HERE")
 firebase_admin.initialize_app(cred)
@@ -66,7 +67,55 @@ for title in titles:
             for context in contexts:
                 context_1.append([context.get('context')])
             title_context[title] = context_1
-print(title_context['Normans'])
+# print(title_context['Normans'])
+
+# @app.route('/', methods=['GET'])
+# def dropdown():
+#     a = title_context
+#     return render_template('index.html', a = title_context)
+
+@app.route('/_update_dropdown')
+def update_dropdown():
+
+    # the value of the first dropdown (selected by the user)
+    selected_class = request.args.get('selected_class', type=str)
+
+    # get values for the second dropdown
+    updated_values = title_context[selected_class]
+
+    # create the value sin the dropdown as a html string
+    html_string_selected = ''
+    for entry in updated_values:
+        html_string_selected += '<option value="{}">{}</option>'.format(entry, entry)
+
+    return jsonify(html_string_selected=html_string_selected)
+
+
+@app.route('/_process_data')
+def process_data():
+    selected_class = request.args.get('selected_class', type=str)
+    selected_entry = request.args.get('selected_entry', type=str)
+
+    # process the two selected values here and return the response; here we just create a dummy string
+
+    return jsonify(random_text="you selected {} and {}".format(selected_class, selected_entry))
+
+
+@app.route('/')
+def index():
+
+    """
+    Initialize the dropdown menues
+    """
+
+    class_entry_relations = title_context
+
+    default_classes = sorted(class_entry_relations.keys())
+    default_values = class_entry_relations[default_classes[0]]
+
+    return render_template('index.html',
+                           all_classes=default_classes,
+                           all_entries=default_values)
 
 @app.route('/', methods=['GET', 'POST'])
 def basic():
@@ -81,6 +130,8 @@ def basic():
             db.child("todo").remove()
         return render_template('index.html')
     return render_template('index.html')
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
