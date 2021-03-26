@@ -21,8 +21,8 @@ max_len_word = 25
 
 # training hyper-parameters
 num_epochs = 10
-batch_size = 64
-learning_rate = 0.7
+batch_size = 128
+learning_rate = 0.85
 drop_prob = 0.1
 hidden_size = 100
 char_channel_width = 5

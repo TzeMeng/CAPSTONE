@@ -73,9 +73,14 @@ d_w_context, d_c_context, d_w_question, d_c_question, d_labels = test_features["
                                                                 test_features["question_char_idxs"],\
                                                                 test_features["label"]
 
-# load the embedding matrix created for our word vocabulary
-with open(os.path.join(config.train_dir, "word_embeddings.pkl"), "rb") as e:
+# # load the embedding matrix created for our word vocabulary
+# with open(os.path.join(config.train_dir, "word_embeddings.pkl"), "rb") as e:
+#     word_embedding_matrix = pickle.load(e)
+
+# load combined word embeddings
+with open(os.path.join(config.train_dir, "combined_word_embeddings.pkl"), "rb") as e:
     word_embedding_matrix = pickle.load(e)
+
 with open(os.path.join(config.train_dir, "char_embeddings.pkl"), "rb") as e:
     char_embedding_matrix = pickle.load(e)
 
@@ -112,35 +117,47 @@ model = BiDAF(word_vectors=word_embedding_matrix,
             char_vectors=char_embedding_matrix,
             hidden_size=hyper_params["hidden_size"],
             drop_prob=hyper_params["drop_prob"])
+
 if hyper_params["pretrained"]:
-    model.load_state_dict(torch.load(os.path.join(experiment_path, "model.pkl"))["state_dict"])
+    #model.load_state_dict(torch.load(os.path.join(experiment_path, "model.pkl"))["state_dict"])
+    model.load_state_dict(torch.load(os.path.join(experiment_path, "combined_model.pkl"))["state_dict"])
 model.to(device)
 
 # define loss and optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adadelta(model.parameters(), hyper_params["learning_rate"], weight_decay=1e-4)
 
-# best loss so far
+# # # best loss so far
+# if hyper_params["pretrained"]:
+#     best_valid_loss = torch.load(os.path.join(experiment_path, "model.pkl"))["best_valid_loss"]
+#     epoch_checkpoint = torch.load(os.path.join(experiment_path, "model_last_checkpoint.pkl"))["epoch"]
+#     print("Best validation loss obtained after {} epochs is: {}".format(epoch_checkpoint, best_valid_loss))
+# else:
+#     best_valid_loss = 100
+#     epoch_checkpoint = 0
+
+# best loss so far (combined_model)
 if hyper_params["pretrained"]:
-    best_valid_loss = torch.load(os.path.join(experiment_path, "model.pkl"))["best_valid_loss"]
-    epoch_checkpoint = torch.load(os.path.join(experiment_path, "model_last_checkpoint.pkl"))["epoch"]
+    best_valid_loss = torch.load(os.path.join(experiment_path, "combined_model.pkl"))["best_valid_loss"]
+    epoch_checkpoint = torch.load(os.path.join(experiment_path, "combined_model_last_checkpoint.pkl"))["epoch"]
     print("Best validation loss obtained after {} epochs is: {}".format(epoch_checkpoint, best_valid_loss))
 else:
     best_valid_loss = 100
     epoch_checkpoint = 0
 
 try:
-    result = pd.read_excel(config.result + "result.xlsx")
+    # result = pd.read_excel(config.result + "result.xlsx") #results of baseline model
+    result = pd.read_excel(config.result + "combined_result.xlsx") #results of hybrid model
 
 except:
-    result = pd.DataFrame(columns =['Batch_Size', 'Epochs', 'Exact Match','F1 Score'])
+    result = pd.DataFrame(columns =['Batch_Size', 'Epochs', 'Exact Match','F1 Score','Train_Loss', 'Test_Loss'])
 
 if __name__ == '__main__':
     # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
     # train the Model
     print("Starting training...")
 
-    epoch_result = pd.DataFrame(columns =['Batch_Size', 'Epochs', 'Exact Match','F1 Score'])
+    epoch_result = pd.DataFrame(columns =['Batch_Size', 'Epochs', 'Exact Match','F1 Score','Train_Loss', 'Test_Loss'])
 
     for epoch in range(hyper_params["num_epochs"]):
         print("##### epoch {:2d}".format(epoch + epoch_checkpoint + 1))
@@ -165,11 +182,15 @@ if __name__ == '__main__':
                     optimizer.step()
                 except:
                     continue
+        try:        
+            train_loss = np.round(train_losses / len(train_dataloader), 2)
+        
+        except (ZeroDivisionError):
+            train_loss = 0
 
-        writer.add_scalars("train", {"loss": np.round(train_losses / len(train_dataloader), 2),
+        writer.add_scalars("train", {"loss": train_loss,
                                     "epoch": epoch + 1+ epoch_checkpoint})
-        print("Train loss of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(train_losses /
-                                                                                    len(train_dataloader), 2)))
+        print("Train loss of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, train_loss))
 
         model.eval()
         valid_losses = 0
@@ -199,23 +220,30 @@ if __name__ == '__main__':
                     except:
                         continue
 
-            writer.add_scalars("valid", {"loss": np.round(valid_losses / len(valid_dataloader), 2),
+            try:        
+                val_loss = np.round(valid_losses / len(valid_dataloader), 2)
+            
+            except (ZeroDivisionError):
+                val_loss = 0
+
+            writer.add_scalars("valid", {"loss": val_loss,
                                         "EM": np.round(valid_em / n_samples, 2),
                                         "F1": np.round(valid_f1 / n_samples, 2),
                                         "epoch": epoch + 1 + epoch_checkpoint})
-            print("Valid loss of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_losses /
-                                                                                        len(valid_dataloader), 2)))
+            print("Valid loss of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, val_loss))
             print("Valid EM of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_em / n_samples, 2)))
             print("Valid F1 of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_f1 / n_samples, 2)))
 
             epoch_result = epoch_result.append({'Batch_Size': config.batch_size, 
                                                 'Epochs': epoch + 1 + epoch_checkpoint,
                                                 'Exact Match': np.round(valid_em / n_samples, 2),
-                                                'F1 Score' : np.round(valid_f1 / n_samples, 2)})
-            result.append(epoch_result)
+                                                'F1 Score' : np.round(valid_f1 / n_samples, 2),
+                                                'Train_Loss' : train_loss,
+                                                'Test_Loss' : val_loss}, ignore_index=True)
+            result = result.append(epoch_result)
 
         #save results
-        result.to_excel(config.result + "result.xlsx")
+        result.to_excel(config.result + "combined_result.xlsx")
 
 
         # save last model weights
@@ -223,7 +251,7 @@ if __name__ == '__main__':
             "epoch": epoch + 1 + epoch_checkpoint,
             "state_dict": model.state_dict(),
             "best_valid_loss": np.round(valid_losses / len(valid_dataloader), 2)
-        }, True, os.path.join(experiment_path, "model_last_checkpoint.pkl"))
+        }, True, os.path.join(experiment_path, "combined_model_last_checkpoint.pkl"))
 
         # save model with best validation error
         is_best = bool(np.round(valid_losses / len(valid_dataloader), 2) < best_valid_loss)
@@ -232,7 +260,7 @@ if __name__ == '__main__':
             "epoch": epoch + 1 + epoch_checkpoint,
             "state_dict": model.state_dict(),
             "best_valid_loss": best_valid_loss
-        }, is_best, os.path.join(experiment_path, "model.pkl"))
+        }, is_best, os.path.join(experiment_path, "combined_model.pkl"))
 
     # export scalar data to JSON for external processing
     writer.export_scalars_to_json(os.path.join(experiment_path, "all_scalars.json"))
