@@ -9,7 +9,7 @@ from firebase_admin import credentials
 from flask import Flask, render_template, request, jsonify
 import json
 
-cred = credentials.Certificate("ENTER YOUR CREDENTIALS HERE")
+cred = credentials.Certificate("C:/Users/Hazel Tan/Documents/BT4103 Capstone/capstone-dsta-firebase-adminsdk-2kf8q-bc7d2cae62.json")
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -86,7 +86,7 @@ def update_dropdown():
     # create the value sin the dropdown as a html string
     html_string_selected = ''
     for entry in updated_values:
-        html_string_selected += '<option value="{}">{}</option>'.format(entry, entry)
+        html_string_selected += '<option value="{}">{}</option>'.format(entry, ' '.join(entry[0].split()[:20]))
 
     return jsonify(html_string_selected=html_string_selected)
 
@@ -98,7 +98,7 @@ def process_data():
 
     # process the two selected values here and return the response; here we just create a dummy string
 
-    return jsonify(random_text="you selected {} and {}".format(selected_class, selected_entry))
+    return jsonify(random_text="Context: {}".format(selected_entry))
 
 
 @app.route('/')
@@ -115,21 +115,13 @@ def index():
 
     return render_template('index.html',
                            all_classes=default_classes,
-                           all_entries=default_values)
+                           all_entries=default_values,
+                           len = len(default_values))
 
-@app.route('/', methods=['GET', 'POST'])
-def basic():
-    if request.method == 'POST':
-        if request.form['submit'] == 'add':
-            name = request.form['name']
-            db.child("todo").push(name)
-            todo = db.child("todo").get()
-            to = todo.val()
-            return render_template('index.html', t=to.values())
-        elif request.form['submit'] == 'delete':
-            db.child("todo").remove()
-        return render_template('index.html')
-    return render_template('index.html')
+@app.route("/test", methods = ['GET','POST'])
+def test():
+    select = request.form.get('val')
+    return (str(select))
 
 
 
