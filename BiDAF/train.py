@@ -148,6 +148,7 @@ else:
 try:
     # result = pd.read_excel(config.result + "result.xlsx") #results of baseline model
     result = pd.read_excel(config.result + "combined_result.xlsx") #results of hybrid model
+    result.drop(columns = "Unnamed : 0 )
 
 except:
     result = pd.DataFrame(columns =['Batch_Size', 'Epochs', 'Exact Match','F1 Score','Train_Loss', 'Test_Loss'])
@@ -234,13 +235,13 @@ if __name__ == '__main__':
             print("Valid EM of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_em / n_samples, 2)))
             print("Valid F1 of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_f1 / n_samples, 2)))
 
-            epoch_result = epoch_result.append({'Batch_Size': config.batch_size, 
-                                                'Epochs': epoch + 1 + epoch_checkpoint,
-                                                'Exact Match': np.round(valid_em / n_samples, 2),
-                                                'F1 Score' : np.round(valid_f1 / n_samples, 2),
-                                                'Train_Loss' : train_loss,
-                                                'Test_Loss' : val_loss}, ignore_index=True)
-            result = result.append(epoch_result)
+        epoch_result = epoch_result.append({'Batch_Size': config.batch_size, 
+                                            'Epochs': epoch + 1 + epoch_checkpoint,
+                                            'Exact Match': np.round(valid_em / n_samples, 2),
+                                            'F1 Score' : np.round(valid_f1 / n_samples, 2),
+                                            'Train_Loss' : train_loss,
+                                            'Test_Loss' : val_loss}, ignore_index=True)
+        result = result.append(epoch_result)
 
 
 
