@@ -242,8 +242,6 @@ if __name__ == '__main__':
                                                 'Test_Loss' : val_loss}, ignore_index=True)
             result = result.append(epoch_result)
 
-        #save results
-        result.to_excel(config.result + "combined_result.xlsx")
 
 
         # save last model weights
@@ -261,6 +259,9 @@ if __name__ == '__main__':
             "state_dict": model.state_dict(),
             "best_valid_loss": best_valid_loss
         }, is_best, os.path.join(experiment_path, "combined_model.pkl"))
+
+    #save results
+    result.to_excel(config.result + "combined_result.xlsx")
 
     # export scalar data to JSON for external processing
     writer.export_scalars_to_json(os.path.join(experiment_path, "all_scalars.json"))
