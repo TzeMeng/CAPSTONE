@@ -148,7 +148,7 @@ else:
 try:
     # result = pd.read_excel(config.result + "result.xlsx") #results of baseline model
     result = pd.read_excel(config.result + "combined_result.xlsx") #results of hybrid model
-    result.drop(columns = "Unnamed : 0 )
+    result.drop(columns = "Unnamed : 0")
 
 except:
     result = pd.DataFrame(columns =['Batch_Size', 'Epochs', 'Exact Match','F1 Score','Train_Loss', 'Test_Loss'])
