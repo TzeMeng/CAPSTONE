@@ -4,7 +4,7 @@ import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
 import json
-
+from datetime import date
 from flask import jsonify
 import requests
 import os
@@ -120,8 +120,44 @@ def test():
 #get the number of correct or wrong answers from feedback system
 @app.route('/get_post', methods = ['POST'])
 def get_accuracy():
-    jsdata = request.get_json()
-    print(jsdata[0]['corr'],"888")
+    if request.method=='POST':
+        jsdata = request.get_json()
+        user_ref=db.collection('visualisation_data')
+        accuracy=user_ref.document("data").get().to_dict()['accuracy']
+        #date=datetime.date(datetime.now())
+        
+        today =date.today().isoformat()
+        
+        new_correct=jsdata[0]['corr']
+        new_total=jsdata[0]['corr']+jsdata[0]['wr']
+        
+        if today in accuracy:
+            current_correct=accuracy[today]['correct']+new_correct
+            current_total=accuracy[today]['total']+new_total
+            update={
+                today:{
+                    "correct":current_correct,
+                    "total":current_total,
+                }
+            }
+
+            
+            #documents=db.collection('data_visualisation').get()
+            user_ref.document(u'data').set({u'accuracy':update}, merge= True)
+
+        else:
+            update={
+                today:{
+                    "correct":new_correct,
+                    "total":new_total,
+                }
+            }
+
+            user_ref.document(u'data').set({u'accuracy':update}, merge= True)
+
+            
+            # print(jsdata[0],"888")
+            # print(datetime.date(datetime.now()))
     
     return jsonify(status="success",data=jsdata)
 
@@ -139,8 +175,9 @@ def dashboard():
         query.append(q[doc])
         time.append(t[doc])
     labels = time
-    values = post
+  
     values1 = query
+    #print(values,"55555555%%%%")
 
     acc=user_ref[0].get('accuracy')
     
@@ -149,28 +186,28 @@ def dashboard():
     days=[]
     total=[]
     right=[]
-    for i in range(len(acc)):
-        total.append(acc[str(i+1)]['total'])
-        right.append(acc[str(i+1)]['correct'])
-        pct=acc[str(i+1)]['correct']/acc[str(i+1)]['total']
+    for i, values in acc.items():
+        total.append(acc[i]['total'])
+        right.append(acc[i]['correct'])
+        pct=acc[i]['correct']/acc[i]['total']
         accuracy.append(pct)
 
-        days.append(i+1)
+        days.append(i)
     total_pct=round(sum(right)/sum(total),2)
     wrong=round(1-total_pct,2)
     pie=[total_pct,wrong]
     
 
-    return render_template('dashboard.html',values=values, label=labels,values1=values1,accuracy=accuracy, pie=pie,days=days)
+    return render_template('dashboard.html',values=post, label=labels,values1=values1,accuracy=accuracy, pie=pie,days=days)
   
 
-def update_sample():
-    user_ref=db.collection('squad2.0')
-    documents=db.collection('squad2.0').get()
-    
-    for docs in documents:
+#def update_sample():
+    # user_ref=db.collection('squad2.0')
+    # documents=db.collection('squad2.0').get()
+    # for docs in documents:
        
-        user_ref.document(u'{}'.format(docs.id)).set({u'Chosen':1}, merge= True)
+    #     user_ref.document(u'{}'.format(docs.id)).set({u'Chosen':1}, merge= True)
+    
     
 def delete():
     user_ref=db.collection('visualisation_data')
