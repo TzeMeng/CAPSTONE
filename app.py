@@ -9,7 +9,7 @@ from firebase_admin import credentials
 from flask import Flask, render_template, request, jsonify
 import json
 
-cred = credentials.Certificate(r"C:/Users/ngtze/Desktop/cred.json")
+cred = credentials.Certificate("C:/Users/ngtze/Desktop/BT4103/CAPSTONE/capstone-dsta-firebase-adminsdk-2kf8q-c1e810409d.json")
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -42,8 +42,12 @@ from flask import *
 
 app = Flask(__name__)
 
-docs = db.collection('squad2.0').get()
-
+# docs = db.collection(u'squad2.0').stream()
+# users_ref = db.collection(u'squad2.0')
+# docs = users_ref.stream()
+docs = db.collection("squad2.0").get()
+# for doc in docs:
+#     print(f'{doc.id} => {doc.to_dict()}')
 # for doc in docs:
 #     print(doc)
 
@@ -52,7 +56,8 @@ titles = []
 
 for doc in docs:
     titles.append(doc.get('title'))
-# print(title)
+
+# # print(docs)
 
 title_context = {}
 
@@ -67,12 +72,13 @@ for title in titles:
             for context in contexts:
                 context_1.append([context.get('context')])
             title_context[title] = context_1
-# print(title_context['Normans'])
 
-# @app.route('/', methods=['GET'])
-# def dropdown():
-#     a = title_context
-#     return render_template('index.html', a = title_context)
+print(sorted(title_context.keys()))
+
+@app.route('/', methods=['GET'])
+def dropdown():
+    a = title_context
+    return render_template('index.html', a = title_context)
 
 @app.route('/_update_dropdown')
 def update_dropdown():
@@ -96,7 +102,7 @@ def process_data():
     selected_class = request.args.get('selected_class', type=str)
     selected_entry = request.args.get('selected_entry', type=str)
 
-    # process the two selected values here and return the response; here we just create a dummy string
+#     # process the two selected values here and return the response; here we just create a dummy string
 
     return jsonify(random_text="Context: {}".format(selected_entry))
 
@@ -112,6 +118,8 @@ def index():
 
     default_classes = sorted(class_entry_relations.keys())
     default_values = class_entry_relations[default_classes[0]]
+
+    # return render_template('index.html')
 
     return render_template('index.html',
                            all_classes=default_classes,
