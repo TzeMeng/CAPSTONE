@@ -80,7 +80,7 @@ def eval(context, question):
             model.load_state_dict(torch.load(os.path.join(config.squad_models, "model_last_checkpoint.pkl"))["state_dict"])
         else:
             model.load_state_dict(torch.load(os.path.join(config.squad_models, "model_last_checkpoint.pkl"),
-                                             map_location=lambda storage, loc: storage)["state_dict"])
+                                             map_location=torch.device('cpu'))["state_dict"])
         print("Model weights successfully loaded.")
     except:
         pass
