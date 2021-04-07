@@ -191,8 +191,12 @@ def dashboard():
         right.append(acc[i]['correct'])
         pct=acc[i]['correct']/acc[i]['total']
         accuracy.append(pct)
+        print(values)
 
         days.append(i)
+    days.sort()
+
+    print(days,"9999999999")
     total_pct=round(sum(right)/sum(total),2)
     wrong=round(1-total_pct,2)
     pie=[total_pct,wrong]
@@ -201,7 +205,35 @@ def dashboard():
     return render_template('dashboard.html',values=post, label=labels,values1=values1,accuracy=accuracy, pie=pie,days=days)
   
 
-#def update_sample():
+# def update_sample():
+
+#     user_ref=db.collection('visualisation_data')
+
+#     today='2021-04-03'
+#     today2='2021-04-04'
+#     today3='2021-04-05'
+#     today4='2021-04-06'
+#     update={
+#                 today:{
+#                     "correct":9,
+#                     "total":10,
+#                 },
+#                 today2:{
+#                     "correct":7,
+#                     "total":10,
+#                 },
+#                 today3:{
+#                     "correct":10,
+#                     "total":10,
+#                 },
+#                 today4:{
+#                     "correct":8,
+#                     "total":10,
+#                 }
+
+#             }
+
+#     user_ref.document(u'data').set({u'accuracy':update}, merge= True)
     # user_ref=db.collection('squad2.0')
     # documents=db.collection('squad2.0').get()
     # for docs in documents:
