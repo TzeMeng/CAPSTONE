@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+{% block title %}
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+{% endblock %}
+{% block mainContent %}
+
+    <div>
+        <div class="row">
+            <div class="form-group col-3">
+              <label for="all_classes">Select a class</label>
+              <select class="form-control" id="all_classes">
+                {% for o in all_classes %}
+                        <option value="{{ o }}">{{ o }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group col-9">
+              <label for="all_entries">Select an entry</label>
+                <form class = "entry" method="POST">
+                  <select class="selectpicker form-control" id="all_entries" name="all_entries">
+                    {% for o in all_entries %}
+                            <option value="{{ o }}">{{ o }}</option>
+                    {% endfor %}
+                  </select>
+                </form>
+            </div>
+            <div>
+                <button type="button" id="process_input" class="btn btn-primary mb-2">Process selection!</button>
+            </div>
+        </div>
+        <div id="processed_results">
+        </div>
+        <div>
+            <form id="getUserInput"  method="post">
+                <label class="control-label requiredField" for="input">
+                    Based on the context chosen, please input one to five queries:
+                </label>
+                    <textarea id="queries" class="form-control" name="queries" rows="3" placeholder="Enter your queries here&#10;Eg. Query 1, Query 2, Query 3... Up to 5 Queries" autofocus></textarea>
+                <span class="help-block" id="hint_textarea">
+                    <span class="text-muted">Please separate your queries with a ',' comma in between each</span>
+                </span>
+                <br/>
+                <br/>
+
+                <form action="/answer/" method="get">
+                    <button type="button" id="model_inputs" class="btn btn-primary mb-2">Run</button>
+                </form>
+            </form>
+        </div>
+
+<!--        <div id = "answer">-->
+<!--            </div>-->
+      <form>
+         <div>
+<!--             <label  id = "answer" for="answer" style="font-size: larger; font-style: oblique;">Outputs:</label>-->
+
+
+      <ul style="list-style-type:none" id="answer">
+
+        {{  answer }}
+        {% for key in answer %}
+                  <p style='font-size:25px; font-style: inherit;color:slategray;font-weight: bold;'>Q{{key}}: {{answer[key]['ques']}}</p>
+        <p style="font-size:20px;font-style:initial;"> Answer: key</p>
+         <li>
+        <p style='font-size:25px; font-style: inherit;color:slategray;font-weight: bold;'>Q{{key}}: {{answer[key]['ques']}}</p>
+        <p style="font-size:20px;font-style:initial;"> Answer: {{answer[key]['ans']}}</p>
+             <p style="font-size:20px;font-style:initial;"> Answer: key</p>
+        <aside>
+
+        <p>
+          <input type="radio"  style="width: 1.5em; height: 2em;vertical-align: middle;" name={{key}} value='correct'>
+
+          <label style="font-family:Georgia, 'Times New Roman', Times, serif;color:turquoise;font-weight: bold;" for="correct">Correct</label><br>
+        </p>
+        <p>
+
+          <input type="radio"  style="width: 1.5em; height: 2em;vertical-align: middle; "  name={{key}} value='wrong'>
+          <label style="font-family:Georgia, 'Times New Roman', Times, serif;color:tomato; font-weight: bold;" for="wrong">Wrong</label><br>
+        </p>
+        </aside>
+        </li>
+      {% endfor %}
+
+      </ul>
+                  </div >
+    <button type="button" class="custom-btn btn-4" id='transfer' onclick="save()">Submit</button>
+
+        </div>
+      </div>
+    </form>
+
+
+
+    </div>
+    
+
+    </div>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+
+    <!-- <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" type="text/javascript"></script> -->
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+<script type="text/javascript">
+//var data=save();
+
+$("#transfer").click(function() {
+          var ele = document.getElementsByTagName('input');
+          var corr=0
+          var wr=0
+          for(i = 0; i < ele.length; i++) {
+              
+           if(ele[i].type="radio") {
+            
+             if(ele[i].checked){
+            
+               if(ele[i].value=='correct'){
+              console.log("true")
+              corr+=1;
+
+              }else{
+              wr+=1;
+            }
+
+          }
+    
+        }
+    }
+      d=[{"corr":corr,"wr":wr}]
+      
+      
+
+      $.ajax({
+        type: "POST",
+        url: "{{'/get_post' }}",
+        contentType: "application/json",
+        data: JSON.stringify(d),
+        dataType: "json",
+        success: function(response) {
+          save()
+            console.log(response);
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
+    alert("Response Subimmited !")
+
+    location.reload();
+      
+});
+
+
+
+
+      $(document).ready(function() {
+        $('#all_classes').change(function(){
+          $.getJSON('/_update_dropdown', {
+            selected_class: $('#all_classes').val()
+          }).success(function(data) {
+                $('#all_entries').html(data.html_string_selected);
+           })
+        });
+        $('#process_input').bind('click', function() {
+            $.getJSON('/_process_data', {
+                selected_class: $('#all_classes').val(),
+                selected_entry: $('#all_entries').val(),
+            }).success(function(data) {
+                $('#processed_results').text(data.random_text);
+            })
+          return false;
+        });
+        $('#model_inputs').bind('click',function(){
+            $.getJSON('/_evaluate', {
+                question: $('#queries').val(),
+                selected_entry: $('#all_entries').val(),
+            }).success(function(data) {
+                $('#answer').text(data.answer);
+            })
+        return false;
+        });
+      });
+    </script>
+
+<style>
+
+button {
+  margin: 20px;
+}
+
+.custom-btn {
+  width: 130px;
+  height: 40px;
+  color: #fff;
+  border-radius: 5px;
+  padding: 10px 25px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+   box-shadow:inset 2px 2px 2px 0px rgba(255,255,255,.5),
+   7px 7px 20px 0px rgba(0,0,0,.1),
+   4px 4px 5px 0px rgba(0,0,0,.1);
+  outline: none;
+}
+
+/* 4 */
+.btn-4 {
+  background-color: #4dccc6;
+background-image: linear-gradient(315deg, #4dccc6 0%, #96e4df 74%);
+  line-height: 42px;
+  padding: 0;
+  border: none;
+}
+.btn-4:hover{
+  background-color: #89d8d3;
+background-image: linear-gradient(315deg, #89d8d3 0%, #03c8a8 74%);
+}
+.btn-4 span {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.btn-4:before,
+.btn-4:after {
+  position: absolute;
+  content: "";
+  right: 0;
+  top: 0;
+   box-shadow:  4px 4px 6px 0 rgba(255,255,255,.9),
+              -4px -4px 6px 0 rgba(116, 125, 136, .2), 
+    inset -4px -4px 6px 0 rgba(255,255,255,.9),
+    inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+  transition: all 0.3s ease;
+}
+.btn-4:before {
+  height: 0%;
+  width: .1px;
+}
+.btn-4:after {
+  width: 0%;
+  height: .1px;
+}
+.btn-4:hover:before {
+  height: 100%;
+}
+.btn-4:hover:after {
+  width: 100%;
+}
+.btn-4 span:before,
+.btn-4 span:after {
+  position: absolute;
+  content: "";
+  left: 0;
+  bottom: 0;
+  box-shadow:  4px 4px 6px 0 rgba(255,255,255,.9),
+              -4px -4px 6px 0 rgba(116, 125, 136, .2), 
+    inset -4px -4px 6px 0 rgba(255,255,255,.9),
+    inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+  transition: all 0.3s ease;
+}
+.btn-4 span:before {
+  width: .1px;
+  height: 0%;
+}
+.btn-4 span:after {
+  width: 0%;
+  height: .1px;
+}
+.btn-4 span:hover:before {
+  height: 100%;
+}
+.btn-4 span:hover:after {
+  width: 100%;
+}
+
+/* 4 */
+.btn-4 {
+  background-color: #4dccc6;
+  background-image: linear-gradient(315deg, #4dccc6 0%, #96e4df 74%);
+  line-height: 42px;
+  padding: 0;
+  border: none;
+}
+.btn-4:hover{
+  background-color: #89d8d3;
+background-image: linear-gradient(315deg, #89d8d3 0%, #03c8a8 74%);
+}
+.btn-4 span {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.btn-4:before,
+.btn-4:after {
+  position: absolute;
+  content: "";
+  right: 0;
+  top: 0;
+   box-shadow:  4px 4px 6px 0 rgba(255,255,255,.9),
+              -4px -4px 6px 0 rgba(116, 125, 136, .2), 
+    inset -4px -4px 6px 0 rgba(255,255,255,.9),
+    inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+  transition: all 0.3s ease;
+}
+.btn-4:before {
+  height: 0%;
+  width: .1px;
+}
+.btn-4:after {
+  width: 0%;
+  height: .1px;
+}
+.btn-4:hover:before {
+  height: 100%;
+}
+.btn-4:hover:after {
+  width: 100%;
+}
+
+/* 3*/
+.btn-3 {
+  background: rgb(255,27,0);
+background: linear-gradient(300deg, rgba(255,27,0,1) 0%, rgba(251,75,2,1) 50%);
+  line-height: 42px;
+  padding: 0;
+  border: none;
+}
+.btn-3:hover{
+  background-color:rgb(255,27,0);
+background-image:linear-gradient(300deg, rgba(255,27,0,1) 0%, rgba(251,75,2,1) 50%);
+}
+
+
+.btn-3 span {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.btn-3 span:before,
+.btn-3 span:after {
+  position: absolute;
+  content: "";
+  left: 0;
+  bottom: 0;
+  box-shadow:  4px 4px 6px 0 rgba(255,255,255,.9),
+              -4px -4px 6px 0 rgba(116, 125, 136, .2), 
+    inset -4px -4px 6px 0 rgba(255,255,255,.9),
+    inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+  transition: all 0.3s ease;
+}
+.btn-3 span:before {
+  width: .1px;
+  height: 0%;
+}
+.btn-3 span:after {
+  width: 0%;
+  height: .1px;
+}
+.btn-3 span:hover:before {
+  height: 100%;
+}
+.btn-3 span:hover:after {
+  width: 100%;
+}
+
+    </style>
+{% endblock %}
+
+{% block additionalscripts %}
+<script src="{{ url_for('static',    filename='js/home.js') }}"></script>
+{% endblock %}
