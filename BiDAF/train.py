@@ -81,7 +81,7 @@ d_w_context, d_c_context, d_w_question, d_c_question, d_labels = test_features["
 with open(os.path.join(config.train_dir, "combined_word_embeddings.pkl"), "rb") as e:
     word_embedding_matrix = pickle.load(e)
 
-with open(os.path.join(config.train_dir, "char_embeddings.pkl"), "rb") as e:
+with open(os.path.join(config.train_dir, "trained_char_embeddings.pkl"), "rb") as e:
     char_embedding_matrix = pickle.load(e)
 
 # load mapping between words and idxs
@@ -147,7 +147,7 @@ else:
 
 try:
     # result = pd.read_excel(config.result + "result.xlsx") #results of baseline model
-    result = pd.read_excel(config.result + "combined_result.xlsx") #results of hybrid model
+    result = pd.read_excel(config.result + "character_combined_result.xlsx") #results of hybrid model
     result.drop(columns = "Unnamed : 0")
 
 except:
@@ -250,7 +250,7 @@ if __name__ == '__main__':
             "epoch": epoch + 1 + epoch_checkpoint,
             "state_dict": model.state_dict(),
             "best_valid_loss": np.round(valid_losses / len(valid_dataloader), 2)
-        }, True, os.path.join(experiment_path, "combined_model_last_checkpoint.pkl"))
+        }, True, os.path.join(experiment_path, "character_combined_model_last_checkpoint.pkl"))
 
         # save model with best validation error
         is_best = bool(np.round(valid_losses / len(valid_dataloader), 2) < best_valid_loss)
@@ -259,11 +259,11 @@ if __name__ == '__main__':
             "epoch": epoch + 1 + epoch_checkpoint,
             "state_dict": model.state_dict(),
             "best_valid_loss": best_valid_loss
-        }, is_best, os.path.join(experiment_path, "combined_model.pkl"))
-
-    #save results
-    result.to_excel(config.result + "combined_result.xlsx")
+        }, is_best, os.path.join(experiment_path, "character_combined_model.pkl"))
 
     # export scalar data to JSON for external processing
     writer.export_scalars_to_json(os.path.join(experiment_path, "all_scalars.json"))
     writer.close()
+
+#save results
+result.to_excel(config.result + "character_combined_result.xlsx")

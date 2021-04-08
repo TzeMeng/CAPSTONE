@@ -114,13 +114,13 @@ class SquadPreprocessor:
                     print(l)
             print("All good")
             word_vocab, word2idx, char_vocab, char2idx = build_vocab(directory + ".context", directory + ".question",
-                                                                     "word_vocab.pkl", "word2idx.pkl", "char_vocab.pkl",
-                                                                     "char2idx.pkl", is_train=is_train,
+                                                                     "word_vocab.pkl", "word2idx.pkl", "trained_char_vocab.pkl",
+                                                                     "trained_char2idx.pkl", is_train=is_train,
                                                                      max_words=config.max_words)
             # create an embedding matrix from the vocabulary with pretrained vectors (GloVe) for words
             build_embeddings(word_vocab, embedding_path=config.glove, output_path="no_random_word_embeddings.pkl",
                              vec_size=config.word_embedding_size)
-            build_embeddings(char_vocab, embedding_path="", output_path="char_embeddings.pkl",
+            build_embeddings(char_vocab, embedding_path="", output_path="trained_char_embeddings.pkl",
                              vec_size=config.char_embedding_size)
 
         else:
@@ -130,7 +130,7 @@ class SquadPreprocessor:
                     print(l)
 
             with open(os.path.join(self.data_dir, "train", "word2idx.pkl"), "rb") as wi,\
-                 open(os.path.join(self.data_dir, "train", "char2idx.pkl"), "rb") as ci:
+                 open(os.path.join(self.data_dir, "train", "trained_char2idx.pkl"), "rb") as ci:
                     word2idx = pickle.load(wi)
                     char2idx = pickle.load(ci)
 
