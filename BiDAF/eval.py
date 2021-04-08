@@ -99,19 +99,11 @@ def eval(context, question):
 
     return prediction
 if __name__ == "__main__":
-    context = " Beer is sold in bottles and cans; it may also be available on draught,\
-    particularly in pubs and bars. The brewing industry is a global business, consisting of several dominant \
-    multinational companies and many thousands of smaller producers ranging from brewpubs to regional breweries. \
-    The strength of beer is usually around 4% to 6% alcohol by volume (abv), although it may vary between 0.5% and 20%, \
-    with some breweries creating examples of 40% abv and above. Beer forms part of the culture of beer-drinking nations \
-    and is associated with social traditions such as beer festivals, as well as a rich pub culture involving activities \
-    like pub crawling, and pub games such as bar billiards."
+    context = "'The Normans (Norman: Nourmands; French: Normands; Latin: Normanni) were the people who in the 10th and 11th centuries gave their name to Normandy, a region in France. They were descended from Norse (Norman comes from Norseman) raiders and pirates from Denmark, Iceland and Norway who, under their leader Rollo, agreed to swear fealty to King Charles III of West Francia. Through generations of assimilation and mixing with the native Frankish and Roman-Gaulish populations, their descendants would gradually merge with the Carolingian-based cultures of West Francia. The distinct cultural and ethnic identity of the Normans emerged initially in the first half of the 10th century, and it continued to evolve over the succeeding centuries.'"
 
 
-
-    questions = ["What is beer sold in?",
-                 "What is the alcoholic strength of beer?",
-                 "What are some activities that beer is often associated with?"]
+    questions = ["In what country is Normandy located?",
+                 "When were the Normans in Normandy?"]
 
     print("C:", context, "\n")
     

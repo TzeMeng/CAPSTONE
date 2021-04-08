@@ -72,7 +72,6 @@ def update_dropdown():
 
     return jsonify(html_string_selected=html_string_selected)
 
-@app.route('/index.html')
 
 
 @app.route('/_process_data')
