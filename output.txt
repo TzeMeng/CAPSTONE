@@ -1,0 +1,16 @@
+{}
+{"1": {"ques": "When was the oil crisis?", "ans": "1979"}}
+{}
+{"1": {"ques": "When was the oil crisis?", "ans": "1979"}}
+{}
+{"1": {"ques": "When was the oil crisis?", "ans": "1979"}}
+{}
+{"1": {"ques": "When was the oil crisis?", "ans": "1979"}}
+{}
+{"1": {"ques": "When was the oil crisis?", "ans": "1979"}}
+{}
+{"1": {"ques": "When was the oil crisis?", "ans": "1979"}}
+{}
+{"1": {"ques": "When was the oil crisis?", "ans": "1979"}}
+{}
+{"1": {"ques": "When was the oil crisis?", "ans": "1979"}}
