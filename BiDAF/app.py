@@ -278,18 +278,18 @@ def home():
 def about():
     return render_template('about.html')
 
-answer = {}
+
 @app.route("/_evaluate")
 def evaluate():
-
+    answer = {"results": []}
     selected_entry = request.args.get('selected_entry', type=str)
     question = request.args.get('question', type=str)
     # answering(selected_entry, question)
-    # questions = question.split(",")
+    questions = question.split(",")
     # count = 1
-    # for q in questions:
-    #     ans = eval(selected_entry, q)
-    #     answer[count] = {"ques": q, "ans": ans}
+    for q in questions:
+        ans = eval(selected_entry, q)
+        answer["results"].append({"ques":q, "ans":ans})
     #     count = count+1
         # print(ans)
     # print(answer)
@@ -297,16 +297,10 @@ def evaluate():
         # print(ans)
 
     # return (selected_entry)
-
-    # d1={1:{"ques":'what is my name?', "ans": 'i am xingying'},
-    #    2:{"ques":'what is my name?', "ans": ' i am hazel'},
-    #    3:{"ques":'what is my name?', "ans": ' i am zhihan'},
-    #    4:{"ques":'what is my name?', "ans": ' i am tze meng'}
-    # }
-    # return answer
+    return answer
     # return render_template('index.html', answer=answer)
     # return jsonify(answer=answer)
-    return answering(selected_entry, question)
+    # return answering(selected_entry, question)
 
 @app.route("/answer/", methods=['GET','POST'])
 def answering(selected_entry, question):

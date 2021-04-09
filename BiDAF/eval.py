@@ -77,9 +77,9 @@ def eval(context, question):
 
     try:
         if config.cuda:
-            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model_last_checkpoint.pkl"))["state_dict"])
+            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model.pkl"))["state_dict"])
         else:
-            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model_last_checkpoint.pkl"),
+            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model.pkl"),
                                              map_location=torch.device('cpu'))["state_dict"])
         print("Model weights successfully loaded.")
     except:
