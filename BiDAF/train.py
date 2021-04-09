@@ -265,5 +265,5 @@ if __name__ == '__main__':
     writer.export_scalars_to_json(os.path.join(experiment_path, "all_scalars.json"))
     writer.close()
 
-#save results
-result.to_excel(config.result + "character_combined_result.xlsx")
+    #save results
+    result.to_excel(config.result + "character_combined_result.xlsx")
