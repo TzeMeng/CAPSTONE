@@ -11,7 +11,7 @@ from eval import eval
 from flask import Flask, render_template, request, jsonify
 import json
 
-cred = credentials.Certificate("C:/Users/Hazel Tan/Documents/BT4103 Capstone/capstone-dsta-firebase-adminsdk-2kf8q-bc7d2cae62.json")
+cred = credentials.Certificate("key.json")
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
