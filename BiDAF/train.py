@@ -241,7 +241,7 @@ if __name__ == '__main__':
                                             'F1 Score' : np.round(valid_f1 / n_samples, 2),
                                             'Train_Loss' : train_loss,
                                             'Test_Loss' : val_loss}, ignore_index=True)
-        result = result.append(epoch_result)
+        
 
 
 
@@ -266,4 +266,5 @@ if __name__ == '__main__':
     writer.close()
 
     #save results
+    result = result.append(epoch_result)
     result.to_excel(config.result + "character_combined_result.xlsx")
