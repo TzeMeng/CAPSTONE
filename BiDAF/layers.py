@@ -6,43 +6,6 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from utils import masked_softmax
 import config
 
-class Embedding(nn.Module):
-    """Embedding layer used by BiDAF, with Words and Characters.
-    Args:
-        word_vectors (torch.Tensor): Pre-trained word vectors.
-        char_vectors (torch.Tensor): Randomly initialized char vectors
-        hidden_size (int): Size of hidden activations.
-        drop_prob (float): Probability of zero-ing out activations
-    """
-    def __init__(self, word_vectors, char_vectors, hidden_size, drop_prob):
-        super(Embedding, self).__init__()
-        self.drop_prob = drop_prob
-        self.w_embed = nn.Embedding.from_pretrained(word_vectors, freeze=True)
-        self.c_embed = nn.Embedding.from_pretrained(char_vectors, freeze=False)
-        self.proj = nn.Linear(word_vectors.size(1), hidden_size, bias=False)
-        self.char_conv = nn.Conv2d(1, config.char_channel_size, (config.char_embedding_size, config.char_channel_width))
-        self.hwy = HighwayEncoder(2, hidden_size * 2)
-
-    def forward(self, x, y):
-        batch_size = x.size(0)
-
-        w_emb = self.w_embed(x)   # (batch_size, seq_len, embed_size)
-        w_emb = F.dropout(w_emb, self.drop_prob, self.training)
-        w_emb = self.proj(w_emb)  # (batch_size, seq_len, hidden_size)
-
-        c_emb = self.c_embed(y)
-        c_emb = F.dropout(c_emb, self.drop_prob, self.training)
-        c_emb = c_emb.view(-1, config.char_embedding_size, c_emb.size(2)).unsqueeze(1)
-        c_emb = self.char_conv(c_emb).squeeze()
-        c_emb = F.max_pool1d(c_emb, c_emb.size(2)).squeeze()
-        c_emb = c_emb.view(batch_size, -1, config.char_channel_size)
-
-        emb = torch.cat([w_emb, c_emb], dim=-1)
-
-        emb = self.hwy(emb)   # (batch_size, seq_len, hidden_size)
-        return emb
-
-
 # class Embedding(nn.Module):
 #     """Embedding layer used by BiDAF, with Words and Characters.
 #     Args:
@@ -57,42 +20,79 @@ class Embedding(nn.Module):
 #         self.w_embed = nn.Embedding.from_pretrained(word_vectors, freeze=True)
 #         self.c_embed = nn.Embedding.from_pretrained(char_vectors, freeze=False)
 #         self.proj = nn.Linear(word_vectors.size(1), hidden_size, bias=False)
-#         # self.char_conv = nn.Conv2d(1, config.char_channel_size, (config.char_embedding_size, config.char_channel_width))
-#         self.char_conv = CNN(in_channels=char_vectors.size(1), out_channels=hidden_size)
+#         self.char_conv = nn.Conv2d(1, config.char_channel_size, (config.char_embedding_size, config.char_channel_width))
 #         self.hwy = HighwayEncoder(2, hidden_size * 2)
-#
-#
+
 #     def forward(self, x, y):
 #         batch_size = x.size(0)
-#
+
 #         w_emb = self.w_embed(x)   # (batch_size, seq_len, embed_size)
 #         w_emb = F.dropout(w_emb, self.drop_prob, self.training)
 #         w_emb = self.proj(w_emb)  # (batch_size, seq_len, hidden_size)
-#
-#         batch_size, sentence_length, max_word_length = y.size()
-#
-#         y = y.contiguous().view(-1, max_word_length)
-#         y = self.c_embed(y)
-#         y = F.dropout(y, self.drop_prob, self.training)
-#
-#         c_emb1 = self.char_conv(y.permute(0, 2, 1), sentence_length, batch_size)
-#         # c_emb = self.c_embed(y)
-#         # c_emb = F.dropout(c_emb, self.drop_prob, self.training)
-#         # c_emb = c_emb.view(-1, config.char_embedding_size, c_emb.size(2)).unsqueeze(1)
-#         # c_emb = self.char_conv(c_emb).squeeze()
-#         # c_emb = F.max_pool1d(c_emb, c_emb.size(2)).squeeze()
-#         # c_emb = c_emb.view(batch_size, -1, config.char_channel_size)
-#
-#         # emb = torch.cat([w_emb, c_emb], dim=-1)
-#
-#         # emb = self.hwy(emb)   # (batch_size, seq_len, hidden_size)
-#
-#         # return emb
-#         concat_emb = torch.cat((c_emb1, w_emb), 2)
-#
-#         hwy_out = self.hwy(concat_emb)
-#
-#         return hwy_out
+
+#         c_emb = self.c_embed(y)
+#         c_emb = F.dropout(c_emb, self.drop_prob, self.training)
+#         c_emb = c_emb.view(-1, config.char_embedding_size, c_emb.size(2)).unsqueeze(1)
+#         c_emb = self.char_conv(c_emb).squeeze()
+#         c_emb = F.max_pool1d(c_emb, c_emb.size(2)).squeeze()
+#         c_emb = c_emb.view(batch_size, -1, config.char_channel_size)
+
+#         emb = torch.cat([w_emb, c_emb], dim=-1)
+
+#         emb = self.hwy(emb)   # (batch_size, seq_len, hidden_size)
+#         return emb
+
+
+class Embedding(nn.Module):
+    """Embedding layer used by BiDAF, with Words and Characters.
+    Args:
+        word_vectors (torch.Tensor): Pre-trained word vectors.
+        char_vectors (torch.Tensor): Randomly initialized char vectors
+        hidden_size (int): Size of hidden activations.
+        drop_prob (float): Probability of zero-ing out activations
+    """
+    def __init__(self, word_vectors, char_vectors, hidden_size, drop_prob):
+        super(Embedding, self).__init__()
+        self.drop_prob = drop_prob
+        self.w_embed = nn.Embedding.from_pretrained(word_vectors, freeze=True)
+        self.c_embed = nn.Embedding.from_pretrained(char_vectors, freeze=False)
+        self.proj = nn.Linear(word_vectors.size(1), hidden_size, bias=False)
+        # self.char_conv = nn.Conv2d(1, config.char_channel_size, (config.char_embedding_size, config.char_channel_width))
+        self.char_conv = CNN(in_channels=char_vectors.size(1), out_channels=hidden_size)
+        self.hwy = HighwayEncoder(2, hidden_size * 2)
+
+
+    def forward(self, x, y):
+        batch_size = x.size(0)
+
+        w_emb = self.w_embed(x)   # (batch_size, seq_len, embed_size)
+        w_emb = F.dropout(w_emb, self.drop_prob, self.training)
+        w_emb = self.proj(w_emb)  # (batch_size, seq_len, hidden_size)
+
+        batch_size, sentence_length, max_word_length = y.size()
+
+        y = y.contiguous().view(-1, max_word_length)
+        y = self.c_embed(y)
+        y = F.dropout(y, self.drop_prob, self.training)
+
+        c_emb1 = self.char_conv(y.permute(0, 2, 1), sentence_length, batch_size)
+        # c_emb = self.c_embed(y)
+        # c_emb = F.dropout(c_emb, self.drop_prob, self.training)
+        # c_emb = c_emb.view(-1, config.char_embedding_size, c_emb.size(2)).unsqueeze(1)
+        # c_emb = self.char_conv(c_emb).squeeze()
+        # c_emb = F.max_pool1d(c_emb, c_emb.size(2)).squeeze()
+        # c_emb = c_emb.view(batch_size, -1, config.char_channel_size)
+
+        # emb = torch.cat([w_emb, c_emb], dim=-1)
+
+        # emb = self.hwy(emb)   # (batch_size, seq_len, hidden_size)
+
+        # return emb
+        concat_emb = torch.cat((c_emb1, w_emb), 2)
+
+        hwy_out = self.hwy(concat_emb)
+
+        return hwy_out
 
 class CNN(nn.Module):
     """A CNN layer for character embeddings, for detailes see https://arxiv.org/abs/1611.01603.

@@ -2,6 +2,7 @@ import os
 import pickle
 import numpy as np
 import torch
+import time
 
 import config
 from model import BiDAF
@@ -11,6 +12,7 @@ device = torch.device("cuda" if config.cuda else "cpu")
 
 
 def eval(context, question):
+    start = time.time()
     with open(os.path.join(config.data_dir, "train", "word2idx.pkl"), "rb") as wi, \
          open(os.path.join(config.data_dir, "train", "char2idx.pkl"), "rb") as ci, \
          open(os.path.join(config.data_dir, "train", "word_embeddings.pkl"), "rb") as wb, \
@@ -96,6 +98,9 @@ def eval(context, question):
         pred1, pred2 = model(context_idx, context_char_idx, question_idx, question_char_idx)
         starts, ends = discretize(pred1.exp(), pred2.exp(), 15, False)
         prediction = " ".join(context[starts.item(): ends.item() + 1])
+    end = time.time()
+    print(f"Runtime of the program is {end - start}")
+
 
     return prediction
 if __name__ == "__main__":

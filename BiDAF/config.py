@@ -28,5 +28,5 @@ hidden_size = 100
 char_channel_width = 5
 char_channel_size = 100
 #cuda = False
-cuda = False
+cuda = True
 pretrained = False
