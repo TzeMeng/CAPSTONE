@@ -148,10 +148,12 @@ else:
 try:
     # result = pd.read_excel(config.result + "result.xlsx") #results of baseline model
     result = pd.read_excel(config.result + "character_combined_result.xlsx") #results of hybrid model
-    result.drop(columns = "Unnamed : 0")
+    # result = result.drop("Unnamed: 0")
+    print("Results Found")
 
 except:
     result = pd.DataFrame(columns =['Batch_Size', 'Epochs', 'Exact Match','F1 Score','Train_Loss', 'Test_Loss'])
+    print("Results not Found, Creating new Document")
 
 if __name__ == '__main__':
     # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
@@ -235,15 +237,13 @@ if __name__ == '__main__':
             print("Valid EM of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_em / n_samples, 2)))
             print("Valid F1 of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_f1 / n_samples, 2)))
 
-        epoch_result = epoch_result.append({'Batch_Size': config.batch_size, 
+            epoch_result = epoch_result.append({'Batch_Size': config.batch_size, 
                                             'Epochs': epoch + 1 + epoch_checkpoint,
                                             'Exact Match': np.round(valid_em / n_samples, 2),
                                             'F1 Score' : np.round(valid_f1 / n_samples, 2),
                                             'Train_Loss' : train_loss,
                                             'Test_Loss' : val_loss}, ignore_index=True)
         
-
-
 
         # save last model weights in the case we need to continue a model training from where it stops (possible memory error)
         save_checkpoint({
