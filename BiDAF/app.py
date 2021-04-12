@@ -301,15 +301,14 @@ def update_chosen(title):
     user_ref=db.collection('Final_squad2')
     
     documents=db.collection('Final_squad2').get()
-    print(documents[0].get('title'),'0000')
+   
     for docs in documents:
-        print(docs.get('title'),'0000')
   
         if docs.get('title')==title:
             
          
             chosen=docs.get('Chosen')+1
-            print(chosen,"9999")
+        
             user_ref.document(u'{}'.format(docs.id)).set({u'Chosen':chosen}, merge= True)
 
 
@@ -321,7 +320,7 @@ def update_length_data(entry,ques,t):
     user_ref=db.collection('visualisation_data')
     cont=db.collection('visualisation_data').get()[0].get('context_len')
     time=sum(t)
-    print(time)
+ 
     if length_entry in cont.keys():
         cont[length_entry].append(time)
         user_ref.document(u'data').set({u'context_len':cont}, merge= True)
@@ -349,7 +348,6 @@ def update_sample():
     for docs in range(len(documents)):
         idx=documents[docs].id
         if int(idx) in x:
-            print('appe')
             user_ref.document(u'{}'.format(documents[docs].id)).set({u'Query_accuracy':{"correct":12, "total": 14}}, merge= True)
     
 

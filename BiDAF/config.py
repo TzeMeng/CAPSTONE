@@ -27,6 +27,6 @@ drop_prob = 0.1
 hidden_size = 100
 char_channel_width = 5
 char_channel_size = 100
-#cuda = False
-cuda = True
+cuda = False
+
 pretrained = False
