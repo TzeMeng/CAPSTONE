@@ -83,7 +83,7 @@ def build_vocab(context_filename, question_filename, word_vocab_filename, word2i
     return word_vocab, word2idx, char_vocab, char2idx
 
 
-def build_embeddings(vocab, embedding_path="", output_path="", vec_size=50):
+def build_embeddings(vocab, embedding_path="", output_path="", vec_size):
     embedding_dict = {}
     # Load pretrained embeddings if an embedding path is provided
     if embedding_path:
