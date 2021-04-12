@@ -148,7 +148,7 @@ else:
 try:
     # result = pd.read_excel(config.result + "result.xlsx") #results of baseline model
     result = pd.read_excel(config.result + "character_combined_result.xlsx") #results of hybrid model
-    # result = result.drop("Unnamed: 0")
+    result = result.drop(columns = ["Unnamed: 0"])
     print("Results Found")
 
 except:
