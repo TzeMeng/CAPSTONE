@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+<head><meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  
+  </head>
+
+  <body>
+{% block title %}My Chart.js Chart{% endblock %}
+
+{% block mainContent %}
+
+<div class="row">
+  <div class="col-md-6" >
+    <canvas width="800" height="600" id="bar-chart"></canvas>
+  </div>
+  <div class="col-md-6" id='center' style="margin-right:0%; margin-bottom: 100%; " >
+      <h2 style="text-align: justify;text-justify: inter-word;">About Us</h2>
+      <p style="text-align: justify;text-justify: inter-word;">"Develop a Smart Search System for enhanced document retrieval and information extraction" is a project conducted by four students from the National University of Singapore (NUS). As part of the Business Analytics Capstone Project, NUS School of Computing partnered with the Defence Science Technology Agency, and the team was under the supervision of Mr Goh Chue Hsien, Senior Data Scientist from the Enterprise IT programme centre under DSTA. Through a semester long of research, the team has explored various Natural Language Processing models seeking to solve the task of Question and Answering. This web application seeks to showcase the research and implementation of our models into a user-friendly application.</p>
+  </div>
+</div>
+
+<script   src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js" ></script>
+<script src="../static/js/jquery.js"></script>
+
+</head>
+<script>
+
+
+new Chart(document.getElementById("bar-chart"), {
+    type: 'bar',
+    data: {
+      labels: {{cloud | tojson }},
+      datasets: [
+        {
+          label:"Number of times chosen: ",
+          backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850","#3e05cd", "#0e5ea2","#9cba9f","#b8c3b7","#a45820"],
+          data: {{num | tojson}},
+        }
+      ]
+    },
+    options: {
+    legend: { display: false },
+      title: {
+        display: true,
+        text:  "Top 10 Popular Topics",
+        font: {
+                size: 20
+                    }
+      },
+
+    scales: {
+          yAxes: [
+              {
+                scaleLabel: {
+                 display: true,
+                  labelString: "Count",
+              },
+                  },
+                ],
+          xAxes: [
+              {
+                scaleLabel: {
+                 display: true,
+                  labelString: "Topics",
+              },
+                  },
+                ]}
+    }
+});
+
+</script>
+
+<style>
+
+body {
+  width: 100vw;
+  height: 100vh;
+}
+</style>
+
+{% endblock %}
+
+</body>
+{% block additionalscripts %}
+
+
+
+{% endblock %}

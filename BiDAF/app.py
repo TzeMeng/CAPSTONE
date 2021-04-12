@@ -29,44 +29,19 @@ firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-# config = {
-#     "apiKey": "AIzaSyACjmO00NqYUJU_bdiddjgXT-y7ltLAiFE",
-#     "authDomain": "capstone-dsta.firebaseapp.com",
-#     "databaseURL": "https://capstone-dsta-default-rtdb.firebaseio.com",
-#     "projectId": "capstone-dsta",
-#     "storageBucket": "capstone-dsta.appspot.com",
-#     "messagingSenderId": "70356572000",
-#     "appId": "1:70356572000:web:e2874f6c7c9b9ed7817005",
-#     "measurementId": "G-3T27VJP341"
-# }
-#
-# firebase = pyrebase.initialize_app(config)
-# db = firebase.database()
-
-
-# db.child("names").push({"name":"tuna"})
-# db.child("names").child("name").update({"name":"swordfish"})
-# users = db.child("names").child("name").get()
-# print(users.val())
-# users = db.child("names").child("name").get()
-# print(users.key())
-# db.child("names").child("name").remove()
-# db.child("names").remove()
 
 
 
 app = Flask(__name__)
 docs = db.collection('Final_squad2').get()
 
-# for doc in docs:
-#     print(doc)
 
 context_para = []
 titles = []
 
 for doc in docs:
     titles.append(doc.get('title'))
-# print(title)
+
 
 title_context = {}
 
@@ -81,12 +56,7 @@ for title in titles:
             for context in contexts:
                 context_1.append(context.get('context'))
             title_context[title] = context_1
-# print(title_context['Normans'])
 
-# @app.route('/', methods=['GET'])
-# def dropdown():
-#     a = title_context
-#     return render_template('index.html', a = title_context)
 
 @app.route('/_update_dropdown')
 def update_dropdown():
@@ -108,7 +78,6 @@ def update_dropdown():
 
 @app.route('/_process_data')
 def process_data():
-    #selected_class = request.args.get('selected_class', type=str)
     selected_entry = request.args.get('selected_entry', type=str)
 
     # process the two selected values here and return the response; here we just create a dummy string
@@ -128,16 +97,6 @@ def index():
 
     default_classes = sorted(class_entry_relations.keys())
     default_values = class_entry_relations[default_classes[0]]
-    ##for testing the outputs in index.html after getting answers
-    # d1={1:{"ques":'what is my name?', "ans": 'i am xingying'},
-    #    2:{"ques":'what is my name?', "ans": ' i am hazel'},
-    #    3:{"ques":'what is my name?', "ans": ' i am zhihan'},
-    #    4:{"ques":'what is my name?', "ans": ' i am tze meng'}
-    # }
-    #D=['APPLE','PEAR']
-
-    # print(answer,"888888")
-
     return render_template('index.html',
                            all_classes=default_classes,
                            all_entries=default_values,
@@ -146,43 +105,75 @@ def index():
                            )
 
 
-# @app.route('/index.html')
-# def transfer(x):
-#     # df = x
-#
-#     """
-#     Initialize the dropdown menues
-#     """
-#     ##for testing the outputs in index.html after getting answers
-#     d1={1:{"ques":'what is my name?', "ans": 'i am xingying'},
-#        2:{"ques":'what is my name?', "ans": ' i am hazel'},
-#        3:{"ques":'what is my name?', "ans": ' i am zhihan'},
-#        4:{"ques":'what is my name?', "ans": ' i am tze meng'}
-#     }
-#     print(x,"99999#####")
-#     #D=['APPLE','PEAR']
-#
-#     return render_template('index.html', answers=d1)
+
 
 @app.route("/test", methods = ['GET','POST'])
 def test():
     select = request.form.get('val')
     return (str(select))
 
+#push the feedback answers to firebase
+def push_feedback(data):
+    if len(data['feedback'])!=0:
+    
+
+        user_ref=db.collection('Future_data')
+        fb=user_ref.document("future").get().to_dict()
+        cont=data['cont']
+        q=data['query']
+        ans=data['feedback']
+        
+        if  cont in fb:
+            idx=int(len(fb[cont]))+1
+            for i,j in zip(q,ans):
+                fb[cont][str(idx)]={'answers':j, "question":i}
+            
+                idx+=1
+            
+        else:
+            idx=0
+            for i,j in zip(q,ans):
+                fb[cont]={str(idx):{'answers':j, "question":i}}
+                idx+=1
+    
+        user_ref.document(u'future').set({u"{}".format(cont) :fb[cont]}, merge= True)
+            
+
+
+
+
+
 #get the number of correct or wrong answers from feedback system
 @app.route('/get_post', methods = ['POST'])
 def get_accuracy():
     if request.method=='POST':
         jsdata = request.get_json()
-        user_ref=db.collection('visualisation_data')
-        accuracy=user_ref.document("data").get().to_dict()['accuracy']
-        #date=datetime.date(datetime.now())
+        
+        push_feedback(jsdata[1])
         
         today =date.today().isoformat()
         
         new_correct=jsdata[0]['corr']
         new_total=jsdata[0]['corr']+jsdata[0]['wr']
+        topic=jsdata[0]['topic']
+        squad_update=db.collection('Final_squad2')
+        squad=db.collection('Final_squad2').get()
         
+
+        for docs in squad:
+           
+            if docs.get('title')==topic:
+                current_correct=docs.get('Query_accuracy')['correct']+new_correct
+                current_total=docs.get('Query_accuracy')['total']+new_total
+                update={
+                        "correct":current_correct,
+                        "total":current_total,}
+                
+        
+                squad_update.document(u'{}'.format(docs.id)).set({u'Query_accuracy':update}, merge= True)
+        
+        user_ref=db.collection('visualisation_data')
+        accuracy=user_ref.document("data").get().to_dict()['accuracy']
         if today in accuracy:
             current_correct=accuracy[today]['correct']+new_correct
             current_total=accuracy[today]['total']+new_total
@@ -194,7 +185,7 @@ def get_accuracy():
             }
 
             
-            #documents=db.collection('data_visualisation').get()
+            
             user_ref.document(u'data').set({u'accuracy':update}, merge= True)
 
         else:
@@ -208,29 +199,39 @@ def get_accuracy():
             user_ref.document(u'data').set({u'accuracy':update}, merge= True)
 
             
-            # print(jsdata[0],"888")
-            # print(datetime.date(datetime.now()))
+        
     
     return jsonify(status="success",data=jsdata)
 
+
 @app.route('/dashboard')
 def dashboard():
-    user_ref=db.collection('visualisation_data').get()
-    post=[]
-    cont=user_ref[0].get('Context_length')
-    q=user_ref[0].get('query_length')
-    t=user_ref[0].get('time')
-    query=[]
-    time=[]
-    for doc in range(len(cont)):
-        post.append(cont[doc])
-        query.append(q[doc])
-        time.append(t[doc])
-    labels = time
-  
-    values1 = query
-    #print(values,"55555555%%%%")
 
+    #For first 2 plots regarding the context and query length
+    user_ref=db.collection('visualisation_data').get()
+    cont=user_ref[0].get('context_len')
+    q=user_ref[0].get('query_len')
+    post=[]
+    query=[]
+    time_q=[]
+    time_c=[]
+    for k,j in cont.items():
+        post.append(int(k))
+        time_c.append(np.mean(j))
+    for k,i in q.items():
+        query.append(int(k))
+        time_q.append(np.mean(i))
+
+  
+    
+    data1=pd.DataFrame({"q":query, "time":time_q})
+    data2=pd.DataFrame({"cont":post,"time":time_c})
+    time_c = data2.sort_values(by=["cont"])['time'].values.tolist()
+    post=data2.sort_values(by=["cont"])['cont'].values.tolist()
+    values1 = data1.sort_values(by=["q"])['q'].values.tolist()
+    time_q = data1.sort_values(by=["q"])['time'].values.tolist()
+    
+    #For the 2 plots regarding the accuracy of the answers 
     acc=user_ref[0].get('accuracy')
     
     accuracy=[]
@@ -243,68 +244,48 @@ def dashboard():
         right.append(acc[i]['correct'])
         pct=acc[i]['correct']/acc[i]['total']
         accuracy.append(pct)
+        days.append(i[5:])
+    a=pd.DataFrame({'days':days, 'accuracy':accuracy})
+    days=a.sort_values(by=['days'])['days'].tolist()
+    accuracy=a.sort_values(by=['days'])['accuracy'].tolist()
+    
+   
 
+    
+    total_pct=round(sum(right)/sum(total),4)
+    wrong=round(1-total_pct,4)
 
-        days.append(i)
-    days.sort()
-
-  
-    total_pct=round(sum(right)/sum(total),2)
-    wrong=round(1-total_pct,2)
     pie=[total_pct,wrong]
-    
+     
+    #For the stacked barchart at the bottom
+    topics=[]
+    query_correct=[]
+    query_wrong=[]
+    total=[]
 
-    return render_template('dashboard.html',values=post, label=labels,values1=values1,accuracy=accuracy, pie=pie,days=days)
+    
+    squad=db.collection('Final_squad2').get()
+        
+    
+    for docs in squad:
+        topics.append(docs.get('title'))
+        corr=docs.get('Query_accuracy')['correct']
+        query_correct.append(corr)
+        query_wrong.append(docs.get('Query_accuracy')['total']-corr)
+        t=docs.get('Query_accuracy')['total']
+        total.append(t)
+    
+    data=pd.DataFrame({"topics": topics , 'q_corr':query_correct, 'q_wrong':query_wrong, 'total':total})
+   
+    query_correct=data.sort_values(by=["q_corr"],ascending=False)['q_corr'].values.tolist()
+    query_wrong=data.sort_values(by=["q_corr"],ascending=False)['q_wrong'].values.tolist()
+    topics=data.sort_values(by=["q_corr"],ascending=False)['topics'].values.tolist()
+            
+            
+
+
+    return render_template('dashboard.html',values_c=post, label_c=time_c,label_q=time_q,values_q=values1,accuracy=accuracy, pie=pie,days=days, topics=topics, q_corr=query_correct, q_wr=query_wrong)
   
-
-# def update_sample():
-#     user_ref=db.collection('Final_squad2')
-#     documents=db.collection('Final_squad2').get()
-#     for docs in documents:
-       
-#         user_ref.document(u'{}'.format(docs.id)).set({u'Chosen':1}, merge= True)
-
-#     user_ref=db.collection('visualisation_data')
-
-#     today='2021-04-03'
-#     today2='2021-04-04'
-#     today3='2021-04-05'
-#     today4='2021-04-06'
-#     update={
-#                 today:{
-#                     "correct":9,
-#                     "total":10,
-#                 },
-#                 today2:{
-#                     "correct":7,
-#                     "total":10,
-#                 },
-#                 today3:{
-#                     "correct":10,
-#                     "total":10,
-#                 },
-#                 today4:{
-#                     "correct":8,
-#                     "total":10,
-#                 }
-
-#             }
-
-#     user_ref.document(u'data').set({u'accuracy':update}, merge= True)
-    # user_ref=db.collection('squad2.0')
-    # documents=db.collection('squad2.0').get()
-    # for docs in documents:
-       
-    #     user_ref.document(u'{}'.format(docs.id)).set({u'Chosen':1}, merge= True)
-    
-    
-def delete():
-    user_ref=db.collection('visualisation_data')
-    documents=db.collection('visualisation_data').get()
-    for docs in documents:
-        if(docs.id!='data'):
-            print(docs.id)
-            user_ref.document(u'{}'.format(docs.id)).delete()
 
 
 @app.route('/')
@@ -315,30 +296,34 @@ def home():
 def about():
     return render_template('about.html')
 
+#update number of times the topic is being chosen
 def update_chosen(title):
     user_ref=db.collection('Final_squad2')
     
     documents=db.collection('Final_squad2').get()
+    print(documents[0].get('title'),'0000')
     for docs in documents:
+        print(docs.get('title'),'0000')
   
         if docs.get('title')==title:
+            
          
             chosen=docs.get('Chosen')+1
+            print(chosen,"9999")
             user_ref.document(u'{}'.format(docs.id)).set({u'Chosen':chosen}, merge= True)
 
-# def update_future_data(selected_entry,question, )
 
-def update_length_data(entry,ques,time):
+
+#update visualisation data in firebase
+def update_length_data(entry,ques,t):
     length_ques=str(sum([len(i.split()) for i in ques.split(',') ]))
     length_entry=str(len(entry.split()))
     user_ref=db.collection('visualisation_data')
     cont=db.collection('visualisation_data').get()[0].get('context_len')
+    time=sum(t)
+    print(time)
     if length_entry in cont.keys():
-        print(cont,length_entry,"999******")
         cont[length_entry].append(time)
-        #cont[length_entry]=values
-        print(cont,"7777777")
-        
         user_ref.document(u'data').set({u'context_len':cont}, merge= True)
     else:
         x=[]
@@ -350,18 +335,39 @@ def update_length_data(entry,ques,time):
     query=db.collection('visualisation_data').get()[0].get('query_len')
     if length_ques in query.keys():
         query[length_ques].append(time)
-        #query[length_ques]=values
-        
         user_ref.document(u'data').set({u'query_len':query}, merge= True)
     else:
         x=[]
         x.append(time)
-        
         query[length_ques]=x
-        print(x,"9999999999999999")
         user_ref.document(u'data').set({u'query_len':query}, merge= True)
    
+def update_sample():
+    user_ref=db.collection('Final_squad2')
+    documents=db.collection('Final_squad2').get()
+    x=[2,6,4,10]
+    for docs in range(len(documents)):
+        idx=documents[docs].id
+        if int(idx) in x:
+            print('appe')
+            user_ref.document(u'{}'.format(documents[docs].id)).set({u'Query_accuracy':{"correct":12, "total": 14}}, merge= True)
+    
 
+
+#data for about page bar-chart
+@app.route('/user_dashboard')
+def user_dashboard():
+    cloud=[]
+    count=[]
+    
+    documents=db.collection('Final_squad2').get()
+    for docs in documents:
+        cloud.append(docs.get('title'))
+        count.append(docs.get('Chosen'))
+    data=pd.DataFrame({"cloud":cloud, "count":count})
+    title=data.sort_values(by=["count"],ascending=False)[:10]
+
+    return render_template('user_dashboard.html',cloud=title['cloud'].values.tolist(), num=title['count'].values.tolist())
 
 @app.route("/_evaluate")
 def evaluate():
@@ -369,47 +375,24 @@ def evaluate():
     selected_entry = request.args.get('selected_entry', type=str)
     question = request.args.get('question', type=str)
     title=request.args.get('selected_class', type=str)
+
     update_chosen(title)
 
-    #time=18
-    #update_length_data(selected_entry,question,time)
+    time=[]
     questions = question.split(",")
-    # count = 1
     for q in questions:
         ans = eval(selected_entry, q)
-        answer["results"].append({"ques":q, "ans":ans})
-    print(answer)
-    #     count = count+1
-        # print(ans)
-    # print(answer)
-    # transfer(answer)
-        # print(ans)
+        time.append(ans[1])
+        answer["results"].append({"ques":q, "ans":ans[0]})
 
-    # return (selected_entry)
-    return jsonify(answer=answer)
-    # return render_template('index.html', answer=answer)
-    # return jsonify(answer=answer)
-    # return answering(selected_entry, question)
+    update_length_data(selected_entry,question,time)
+    return answer
 
-@app.route("/answer/", methods=['GET','POST'])
-def answering(selected_entry, question):
-    answer ={}
-    questions = question.split(",")
-    count = 1
-    for q in questions:
-        ans = eval(selected_entry, q)
-        answer[count] = {"ques": q, "ans": ans}
-        count = count + 1
-    print(answer)
-    # return answer
-    return render_template('index.html', answer=answer)
 
 
 
 #runs the application in debug mode
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 4000))
-
-    #update_sample()
-    #app.run(host='0.0.0.0', port=port)
+   
     app.run(debug=True)

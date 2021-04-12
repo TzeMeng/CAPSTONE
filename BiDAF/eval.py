@@ -2,7 +2,7 @@ import os
 import pickle
 import numpy as np
 import torch
-
+import time
 import config
 from model import BiDAF
 from utils import clean_text, word_tokenize, discretize
@@ -11,6 +11,7 @@ device = torch.device("cuda" if config.cuda else "cpu")
 
 
 def eval(context, question):
+    start=time.time()
     with open(os.path.join(config.data_dir, "train", "word2idx.pkl"), "rb") as wi, \
          open(os.path.join(config.data_dir, "train", "char2idx.pkl"), "rb") as ci, \
          open(os.path.join(config.data_dir, "train", "word_embeddings.pkl"), "rb") as wb, \
@@ -97,7 +98,10 @@ def eval(context, question):
         starts, ends = discretize(pred1.exp(), pred2.exp(), 15, False)
         prediction = " ".join(context[starts.item(): ends.item() + 1])
 
-    return prediction
+    end=time.time()
+    diff=end-start
+
+    return prediction,diff
 if __name__ == "__main__":
     context = "'The Normans (Norman: Nourmands; French: Normands; Latin: Normanni) were the people who in the 10th and 11th centuries gave their name to Normandy, a region in France. They were descended from Norse (Norman comes from Norseman) raiders and pirates from Denmark, Iceland and Norway who, under their leader Rollo, agreed to swear fealty to King Charles III of West Francia. Through generations of assimilation and mixing with the native Frankish and Roman-Gaulish populations, their descendants would gradually merge with the Carolingian-based cultures of West Francia. The distinct cultural and ethnic identity of the Normans emerged initially in the first half of the 10th century, and it continued to evolve over the succeeding centuries.'"
 
