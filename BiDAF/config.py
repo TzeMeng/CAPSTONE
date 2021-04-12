@@ -21,12 +21,12 @@ max_len_word = 25
 
 # training hyper-parameters
 num_epochs = 10
-batch_size = 64
+batch_size = 32
 learning_rate = 0.7
 drop_prob = 0.1
 hidden_size = 100
 char_channel_width = 5
 char_channel_size = 100
 #cuda = False
-cuda = False
+cuda = True
 pretrained = False

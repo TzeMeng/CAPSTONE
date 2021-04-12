@@ -78,7 +78,7 @@ d_w_context, d_c_context, d_w_question, d_c_question, d_labels = test_features["
 #     word_embedding_matrix = pickle.load(e)
 
 # load combined word embeddings
-with open(os.path.join(config.train_dir, "combined_word_embeddings.pkl"), "rb") as e:
+with open(os.path.join(config.train_dir, "word_embeddings.pkl"), "rb") as e:
     word_embedding_matrix = pickle.load(e)
 
 with open(os.path.join(config.train_dir, "trained_char_embeddings.pkl"), "rb") as e:
@@ -120,7 +120,7 @@ model = BiDAF(word_vectors=word_embedding_matrix,
 
 if hyper_params["pretrained"]:
     #model.load_state_dict(torch.load(os.path.join(experiment_path, "model.pkl"))["state_dict"])
-    model.load_state_dict(torch.load(os.path.join(experiment_path, "combined_model.pkl"))["state_dict"])
+    model.load_state_dict(torch.load(os.path.join(experiment_path, "char_combined_model.pkl"))["state_dict"])
 model.to(device)
 
 # define loss and optimizer
@@ -138,8 +138,8 @@ optimizer = torch.optim.Adadelta(model.parameters(), hyper_params["learning_rate
 
 # best loss so far (combined_model)
 if hyper_params["pretrained"]:
-    best_valid_loss = torch.load(os.path.join(experiment_path, "combined_model.pkl"))["best_valid_loss"]
-    epoch_checkpoint = torch.load(os.path.join(experiment_path, "combined_model_last_checkpoint.pkl"))["epoch"]
+    best_valid_loss = torch.load(os.path.join(experiment_path, "char_combined_model.pkl"))["best_valid_loss"]
+    epoch_checkpoint = torch.load(os.path.join(experiment_path, "char_combined_model.pkl"))["epoch"]
     print("Best validation loss obtained after {} epochs is: {}".format(epoch_checkpoint, best_valid_loss))
 else:
     best_valid_loss = 100
@@ -148,10 +148,12 @@ else:
 try:
     # result = pd.read_excel(config.result + "result.xlsx") #results of baseline model
     result = pd.read_excel(config.result + "character_combined_result.xlsx") #results of hybrid model
-    result.drop(columns = "Unnamed : 0")
+    # result = result.drop("Unnamed: 0")
+    print("Results Found")
 
 except:
     result = pd.DataFrame(columns =['Batch_Size', 'Epochs', 'Exact Match','F1 Score','Train_Loss', 'Test_Loss'])
+    print("Results not Found, Creating new Document")
 
 if __name__ == '__main__':
     # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
@@ -235,22 +237,20 @@ if __name__ == '__main__':
             print("Valid EM of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_em / n_samples, 2)))
             print("Valid F1 of the model at epoch {} is: {}".format(epoch + 1 + epoch_checkpoint, np.round(valid_f1 / n_samples, 2)))
 
-        epoch_result = epoch_result.append({'Batch_Size': config.batch_size, 
+            epoch_result = epoch_result.append({'Batch_Size': config.batch_size, 
                                             'Epochs': epoch + 1 + epoch_checkpoint,
                                             'Exact Match': np.round(valid_em / n_samples, 2),
                                             'F1 Score' : np.round(valid_f1 / n_samples, 2),
                                             'Train_Loss' : train_loss,
                                             'Test_Loss' : val_loss}, ignore_index=True)
-        result = result.append(epoch_result)
+        
 
-
-
-        # save last model weights
+        # save last model weights in the case we need to continue a model training from where it stops (possible memory error)
         save_checkpoint({
             "epoch": epoch + 1 + epoch_checkpoint,
             "state_dict": model.state_dict(),
             "best_valid_loss": np.round(valid_losses / len(valid_dataloader), 2)
-        }, True, os.path.join(experiment_path, "character_combined_model_last_checkpoint.pkl"))
+        }, True, os.path.join(experiment_path, "char_combined_model_last_checkpoint.pkl"))
 
         # save model with best validation error
         is_best = bool(np.round(valid_losses / len(valid_dataloader), 2) < best_valid_loss)
@@ -259,11 +259,12 @@ if __name__ == '__main__':
             "epoch": epoch + 1 + epoch_checkpoint,
             "state_dict": model.state_dict(),
             "best_valid_loss": best_valid_loss
-        }, is_best, os.path.join(experiment_path, "character_combined_model.pkl"))
+        }, is_best, os.path.join(experiment_path, "char_combined_model.pkl"))
 
     # export scalar data to JSON for external processing
     writer.export_scalars_to_json(os.path.join(experiment_path, "all_scalars.json"))
     writer.close()
 
-#save results
-result.to_excel(config.result + "character_combined_result.xlsx")
+    #save results
+    result = result.append(epoch_result)
+    result.to_excel(config.result + "character_combined_result.xlsx")

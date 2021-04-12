@@ -97,6 +97,9 @@ def eval(context, question):
         pred1, pred2 = model(context_idx, context_char_idx, question_idx, question_char_idx)
         starts, ends = discretize(pred1.exp(), pred2.exp(), 15, False)
         prediction = " ".join(context[starts.item(): ends.item() + 1])
+    end = time.time()
+    print(f"Runtime of the program is {end - start}")
+
 
     end=time.time()
     diff=end-start
