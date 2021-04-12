@@ -13,9 +13,9 @@ device = torch.device("cuda" if config.cuda else "cpu")
 def eval(context, question):
     start=time.time()
     with open(os.path.join(config.data_dir, "train", "word2idx.pkl"), "rb") as wi, \
-         open(os.path.join(config.data_dir, "train", "char2idx.pkl"), "rb") as ci, \
-         open(os.path.join(config.data_dir, "train", "word_embeddings.pkl"), "rb") as wb, \
-         open(os.path.join(config.data_dir, "train", "char_embeddings.pkl"), "rb") as cb:
+         open(os.path.join(config.data_dir, "train", "trained_char2idx.pkl"), "rb") as ci, \
+         open(os.path.join(config.data_dir, "train", "combined_word_embeddings.pkl"), "rb") as wb, \
+         open(os.path.join(config.data_dir, "train", "trained_char_embeddings.pkl"), "rb") as cb:
         word2idx = pickle.load(wi)
         char2idx = pickle.load(ci)
         word_embedding_matrix = pickle.load(wb)
@@ -78,9 +78,9 @@ def eval(context, question):
 
     try:
         if config.cuda:
-            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model.pkl"))["state_dict"])
+            model.load_state_dict(torch.load(os.path.join(config.squad_models, "final_combined_model.pkl"))["state_dict"])
         else:
-            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model.pkl"),
+            model.load_state_dict(torch.load(os.path.join(config.squad_models, "final_combined_model.pkl"),
                                              map_location=torch.device('cpu'))["state_dict"])
         print("Model weights successfully loaded.")
     except:
