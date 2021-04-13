@@ -31,6 +31,18 @@ Performance Page:
 About Page:
 ![image](https://user-images.githubusercontent.com/51269684/114511237-3be10080-9c6a-11eb-9832-ca8c64fb68c0.png)
 
+## Before running any files, kindly install the relevant dependencies
+```bash
+pip install -r requirements.txt
+```
+
+
+## FrontEnd Workflow
+
+Simply run app.py in the console
+```bash
+python app.py
+```
 
 ## BiDAF Workflow
 
