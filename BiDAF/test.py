@@ -66,9 +66,9 @@ if __name__ == '__main__':
     idx2word = dict([(y, x) for x, y in word2idx.items()])
 
     # load the embedding matrix created for our word vocabulary
-    with open(os.path.join(config.train_dir, "word_embeddings.pkl"), "rb") as e:
+    with open(os.path.join(config.train_dir, "combined_word_embeddings.pkl"), "rb") as e:
         word_embedding_matrix = pickle.load(e)
-    with open(os.path.join(config.train_dir, "char_embeddings.pkl"), "rb") as e:
+    with open(os.path.join(config.train_dir, "trained_char_embeddings.pkl"), "rb") as e:
         char_embedding_matrix = pickle.load(e)
 
     # transform them into Tensors
@@ -93,9 +93,9 @@ if __name__ == '__main__':
                 drop_prob=hyper_params["drop_prob"])
     try:
         if config.cuda:
-            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model_last_checkpoint.pkl"))["state_dict"])
+            model.load_state_dict(torch.load(os.path.join(config.squad_models, "final_combined_model_last_checkpoint.pkl"))["state_dict"])
         else:
-            model.load_state_dict(torch.load(os.path.join(config.squad_models, "model_last_checkpoint.pkl"),
+            model.load_state_dict(torch.load(os.path.join(config.squad_models, "final_combined_model_last_checkpoint.pkl"),
                                             map_location=lambda storage, loc: storage)["state_dict"])
         print("Model weights successfully loaded.")
     except:
