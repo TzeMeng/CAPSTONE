@@ -1,7 +1,7 @@
 # BT4103 Business Analytics Capstone Project
 ## Developing a Smart Search System for Document Retrieval and Information Extraction
 
-The project aims to develop a smart search system for enhanced document retrieval and information extraction, by leveraging on and integrating state-of-the-art Natural Language Processing (NLP) techniques.
+This project aims to develop a smart search system for enhanced document retrieval and information extraction, by leveraging on and integrating state-of-the-art Natural Language Processing (NLP) techniques.
 
 
 ## Dataset Used
