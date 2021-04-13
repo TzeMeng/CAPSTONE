@@ -1,6 +1,6 @@
 # The BiDAF directory consists of not limited to the following files:
 
-utils.py <file> <br>
+1. utils.py <file> <br>
 Contains the Following Functions: <br>
   clean_text(text) : Function that takes in a text and removes brackets, break lines (/n) indicator and quotation marks.<br>
   word_tokenize(sent) : Tokenizes each word in a sentence. <br>
