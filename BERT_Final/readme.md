@@ -6,6 +6,8 @@ BERT_Test.ipynb contains the codes to test the BERT model to produce an answer w
 
 bert.h5 contains the model weights. <br />
 
+bert_optimizer_tunning_visualization.ipynb contains the visualization for the optimizer parameters tuning process. <br />
+
 ## Usage
 Upload both Jupyter Notebooks to Google Collaboratory <br />
 Change the runtime type under the tab runtime to TPU <br />
