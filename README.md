@@ -18,6 +18,18 @@ Some examples of the question-answer pair that are queried to this context parag
 - *What section of North Carolina makes up 45% of the state? A: the Atlantic Coastal Plain*
 - *What is the section in the middle 35% of North Carolina called? A: the Piedmont region*
 
+## Frontend Preview:
+Home Page:
+![image](https://user-images.githubusercontent.com/51269684/114511173-25d34000-9c6a-11eb-9abc-fec36f4db48b.png)
+
+Changes to Home Page after asking a question:
+![image](https://user-images.githubusercontent.com/51269684/114511213-34215c00-9c6a-11eb-86a5-d0991507aa09.png)
+
+Performance Page:
+![image](https://user-images.githubusercontent.com/51269684/114511622-b7db4880-9c6a-11eb-8815-c3c698ad9fb9.png)
+
+About Page:
+![image](https://user-images.githubusercontent.com/51269684/114511237-3be10080-9c6a-11eb-9832-ca8c64fb68c0.png)
 ## BERT Model Workflow
 
 BERT_Train.ipynb contains the codes to train the BERT model with the tuned parameters. <br />
