@@ -1,4 +1,4 @@
-# The BiDAF directory consists of not limited to the following files:
+# The BiDAF directory consists of and not limited to the following files:
 
 - utils.py <file> <br>
   - Contains the Following Functions: <br>
@@ -37,55 +37,55 @@
      - compute_f1 (true ans, prediction)
         - Compute the F1 scores
         - Codes provided by SQuAD 2.0
-  - make_dataset.py <file>
-    - Python Script that process the raw json files into a format for model training
-  - data_loader.py <file>
-    - Python Script that stores the SquadDataset Class to facilitate the formatting of data to be fed into the model
-  - layers.py <file>
-     - Contains the various Classes to be used as hidden layers in the BiDAF model:
-       - Embedding: 2 Different Embedding layers, the first for randomized character embedding and the second for trained character embedding
-       - CNN : To train Character Embeddings
-       - HighwayEncoder: Facilitate the flow of information in deep networks
-       - RNNEncoder: Capture contextual information
-       - BiDAFAttention : Form the attention layer between query and context (vice versa)
-       - BiDAFOutput : Collates results from intermediate layers and returns a final prediction
-  - model.py <file>
-    - Contains the framework of the model and by utilizing the various classes implemented in layers.py
-  - train.py <file>
-    - Python Script for training and saving the model
-  - test.py <file>
-    - Python Script to evaluate model’s performance on the test/ dev set
-  - eval.py <file>
-    - Python Script that is called by the front end that takes in a context and a question and returns an answer predicted by the model.
-  - config.py <file>
-    - Python file that stores the user-tunable parameters
-  - Output <folder> (Store the Models)
-    - exp-1<folder>
-      - model.pkl <file>
-        - Contains the best performing BiDAF implementation with GloVE embeddings of 100 dimensions and Randomised Character Embeddings of 100 dimensions. 
-      - model_last_checkpoint.pkl <file>
-        - Contains the last model state of the BiDAF implementation with GloVE embeddings of 100 dimensions and Randomised Character Embeddings of 100 dimensions
-        - Saved previous state of the model for further training purposes
-      - char_combined_model.pkl <file>
-        - Contains the best performing BiDAF implementation with GloVE embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
-      - char_combined_model_last_checkpoint.pkl <file>
-        - Contains the last model state of the BiDAF implementation with GloVE embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
-        - Saved previous state of the model for further training purposes
+- make_dataset.py <file>
+  - Python Script that process the raw json files into a format for model training
+- data_loader.py <file>
+  - Python Script that stores the SquadDataset Class to facilitate the formatting of data to be fed into the model
+- layers.py <file>
+   - Contains the various Classes to be used as hidden layers in the BiDAF model:
+     - Embedding: 2 Different Embedding layers, the first for randomized character embedding and the second for trained character embedding
+     - CNN : To train Character Embeddings
+     - HighwayEncoder: Facilitate the flow of information in deep networks
+     - RNNEncoder: Capture contextual information
+     - BiDAFAttention : Form the attention layer between query and context (vice versa)
+     - BiDAFOutput : Collates results from intermediate layers and returns a final prediction
+- model.py <file>
+  - Contains the framework of the model and by utilizing the various classes implemented in layers.py
+- train.py <file>
+  - Python Script for training and saving the model
+- test.py <file>
+  - Python Script to evaluate model’s performance on the test/ dev set
+- eval.py <file>
+  - Python Script that is called by the front end that takes in a context and a question and returns an answer predicted by the model.
+- config.py <file>
+  - Python file that stores the user-tunable parameters
+- Output <folder> (Store the Models)
+  - exp-1<folder>
+    - model.pkl <file>
+      - Contains the best performing BiDAF implementation with GloVE embeddings of 100 dimensions and Randomised Character Embeddings of 100 dimensions. 
+    - model_last_checkpoint.pkl <file>
+      - Contains the last model state of the BiDAF implementation with GloVE embeddings of 100 dimensions and Randomised Character Embeddings of 100 dimensions
+      - Saved previous state of the model for further training purposes
+    - char_combined_model.pkl <file>
+      - Contains the best performing BiDAF implementation with GloVE embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
+    - char_combined_model_last_checkpoint.pkl <file>
+      - Contains the last model state of the BiDAF implementation with GloVE embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
+      - Saved previous state of the model for further training purposes
 
-      - final_combined_model.pkl <file>
-        - Contains the best performing BiDAF implementation with GloVE embeddings of 100 dimensions, BERT embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
-      - final_combined_model_last_checkpoint.pkl <file>
-        - Contains the last model state of the BiDAF implementation with GloVE embeddings of 100 dimensions, BERT embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
-        - Saved previous state of the model for further training purposes
+    - final_combined_model.pkl <file>
+      - Contains the best performing BiDAF implementation with GloVE embeddings of 100 dimensions, BERT embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
+    - final_combined_model_last_checkpoint.pkl <file>
+      - Contains the last model state of the BiDAF implementation with GloVE embeddings of 100 dimensions, BERT embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
+      - Saved previous state of the model for further training purposes
 
-  - result <folder>
-    - result.xlsx
-      - Contains training loss, test loss, F1 scores and Exact Match scores attained at the different epochs  by the BiDAF implementation with GloVE embeddings of 100 dimensions and Randomised Character Embeddings of 100 dimensions. 
-    - character_combined_result.xlsx
-        - Contains training loss, test loss, F1 scores and Exact Match scores attained at the different epochs  by the BiDAF implementation with GloVE embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
-    - final_combined_result.xlsx
-      - Contains training loss, test loss, F1 scores and Exact Match scores attained at the different epochs  by the BiDAF implementation with GloVE embeddings of 100 dimensions, BERT embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
- 
+- result <folder>
+  - result.xlsx
+    - Contains training loss, test loss, F1 scores and Exact Match scores attained at the different epochs  by the BiDAF implementation with GloVE embeddings of 100 dimensions and Randomised Character Embeddings of 100 dimensions. 
+  - character_combined_result.xlsx
+      - Contains training loss, test loss, F1 scores and Exact Match scores attained at the different epochs  by the BiDAF implementation with GloVE embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
+  - final_combined_result.xlsx
+    - Contains training loss, test loss, F1 scores and Exact Match scores attained at the different epochs  by the BiDAF implementation with GloVE embeddings of 100 dimensions, BERT embeddings of 100 dimensions and Trained Character Embeddings of 100 dimensions.
+
 - context <folder>
   - Content_embed_50.pkl <file>
     - Contains the BERT embeddings vectors of 50 dimensions
