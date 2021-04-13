@@ -70,7 +70,7 @@ Lastly to use the model, you may want to take a look into eval.py. It has a func
 ```bash
 python eval.py
 ```
-
+To create the Embeddings that combines the GloVe embeddings with the BERT embeddings : Kindly refer to combine_embeddings.ipynb
 
 ## BERT Model Workflow
 
