@@ -43,6 +43,8 @@ bert_optimizer_tunning_visualization.ipynb contains the visualization for the op
 ## Usage
 Upload both Jupyter Notebooks to Google Collaboratory <br />
 Change the runtime type under the tab runtime to TPU <br />
+![image](https://user-images.githubusercontent.com/70834772/114512914-31276b00-9c6c-11eb-96b4-4b63b8be2d41.png)
+
 
 Run the BERT_Train notebook by clicking on Run all under runtime tab<br />
 Save the bert.h5 file from the google collaboratory files on the left of the webpage<br />
