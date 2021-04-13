@@ -1,12 +1,12 @@
 # The BiDAF directory consists of not limited to the following files:
 
-utils.py <file>
-Contains the Following Functions:
-  clean_text(text) : Function that takes in a text and removes brackets, break lines (/n) indicator and quotation marks.
-  word_tokenize(sent) : Tokenizes each word in a sentence.
-  covert_idx(text, sent) : Function that takes in a text and a sentence, returns the start and end index of the text if it is a substring of the sentence
-  save_checkpoint(state, is_best, filename) : Saves the state of the model after the last training epoch for the purpose of future retraining if required
-  discretize(p_start, p_end, max_len, no_answer) : Function that takes in a set of probabilities of the start index of the answer as well as a set of probabilities for the end                                                     index of the answer, subsequently return the start index and end index that maximises the pairwise probabilities.
+utils.py <file> <br>
+Contains the Following Functions: <br>
+  clean_text(text) : Function that takes in a text and removes brackets, break lines (/n) indicator and quotation marks.<br>
+  word_tokenize(sent) : Tokenizes each word in a sentence. <br>
+  covert_idx(text, sent) : Function that takes in a text and a sentence, returns the start and end index of the text if it is a substring of the sentence <br>
+  save_checkpoint(state, is_best, filename) : Saves the state of the model after the last training epoch for the purpose of future retraining if required <br>
+  discretize(p_start, p_end, max_len, no_answer) : Function that takes in a set of probabilities of the start index of the answer as well as a set of probabilities for the end                                                     index of the answer, subsequently return the start index and end index that maximises the pairwise probabilities. <br>
 compute_batch_metrics(context, idx2word, pred1, pred2, batch_labels)
 Function for scoring the Model Prediction by comparing it with the true answers
 build_embeddings(vocab, embedding_path="", output_path="", vec_size = 50)
