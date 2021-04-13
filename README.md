@@ -30,6 +30,36 @@ Performance Page:
 
 About Page:
 ![image](https://user-images.githubusercontent.com/51269684/114511237-3be10080-9c6a-11eb-9832-ca8c64fb68c0.png)
+
+
+## BiDAF Workflow
+
+All user-tunable parameters can be found in config.py
+
+Firstly, ensure that the GloVe corpus has been downloaded and placed in the the BiDAF directory, the GloVe corpus can be downloaded from : https://nlp.stanford.edu/projects/glove/
+
+Secondly, ensure that the data folder that has been submitted seperately (certain files had size exceeding the threshold on Github). Another way of getting the processed data would be to run the python script make_dataset.py, however since there are many implementations that deviates slightly, there is a need to made slight adjustments to return all data files. The make_dataset.py is now configured to produced default GloVe Embeddings and trained character embeddings.
+
+```bash
+python make_dataset.py
+```
+
+With regard to training the model, you may just run the python script train.py. Similar to the case of dataset creation, the train.py is configured to train the Hybrid Model (GloVe Embeddings + Trained Character Embeddings + BERT Embeddings)
+```bash
+python train.py
+```
+
+To test the performance of the model on the test/ Dev set ; the test set is not configured to test the the Hybrid Model (GloVe Embeddings + Trained Character Embeddings + BERT Embeddings)
+```bash
+python test.py
+```
+
+Lastly to use the model, you may want to take a look into eval.py. It has a function that takes in a context paragraph as well as a question and it returns the model's prediction. The eval.py will also be the Python script that is called by the Frontend
+```bash
+python eval.py
+```
+
+
 ## BERT Model Workflow
 
 BERT_Train.ipynb contains the codes to train the BERT model with the tuned parameters. <br />
